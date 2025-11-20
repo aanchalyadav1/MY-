@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Dashboard — Aanchal</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<script> if(localStorage.getItem('adminAuth') !== 'true') location.href='login.html'; </script>
+
+<header class="admin-header">
+  <div class="admin-brand">
+    <div class="admin-logo">A</div>
+    <div>
+      <div class="admin-name">AANCHAL — ADMIN</div>
+      <div class="admin-sub">Manage portfolio content</div>
+    </div>
+  </div>
+  <div class="admin-actions"><button class="ghost-btn" onclick="logout()">Logout</button></div>
+</header>
+
+<main class="admin-main">
+  <section class="admin-grid">
+    <article class="admin-panel">
+      <h3>Certificates</h3>
+      <textarea id="certData" placeholder='[{"title":"AWS Cloud","platform":"Amazon"}]'></textarea>
+      <div class="panel-row"><button class="primary-btn" onclick="saveCertificates()">Save</button><button class="ghost-btn" onclick="previewCertificates()">Preview</button></div>
+    </article>
+
+    <article class="admin-panel">
+      <h3>Internships</h3>
+      <textarea id="internData" placeholder='[{"company":"OctaNet","role":"Python Dev","duration":"Jan 2025"}]'></textarea>
+      <div class="panel-row"><button class="primary-btn" onclick="saveInternships()">Save</button><button class="ghost-btn" onclick="previewInternships()">Preview</button></div>
+    </article>
+
+    <article class="admin-panel wide">
+      <h3>Projects (GitHub import)</h3>
+      <div class="inline-row"><input id="githubUser" placeholder="GitHub username"><button class="primary-btn" onclick="fetchGithub()">Fetch</button></div>
+      <textarea id="projectsBox" placeholder='[{"name":"AI Art","desc":"...","url":"..."}]'></textarea>
+      <div class="panel-row"><button class="primary-btn" onclick="saveProjects()">Save Projects</button><button class="ghost-btn" onclick="previewProjects()">Preview</button></div>
+    </article>
+  </section>
+
+  <aside class="admin-preview" id="adminPreview">
+    <h3>Live Preview</h3>
+    <div id="previewArea">Click preview to show content here.</div>
+  </aside>
+</main>
+
+<script src="admin.js"></script>
+</body></html>
