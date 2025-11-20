@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="card" style="max-width:980px;margin:22px auto">
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
+
+  <div class="card" style="max-width:980px;margin:22px auto;position:relative;z-index:3">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2>Admin Dashboard</h2>
-      <div>
-        <button id="signOut" class="btn-ghost">Sign out</button>
-      </div>
+      <div><button id="signOut" class="btn-ghost">Sign out</button></div>
     </div>
-
-    <p style="opacity:.9">Manage Certificates, Internships and Projects.</p>
-    <hr style="margin:12px 0"/>
 
     <section>
       <h3>Certificates</h3>
@@ -24,6 +20,7 @@
       <div style="display:flex;gap:8px;margin-top:8px">
         <input id="certTitle" placeholder="Title">
         <input id="certIssuer" placeholder="Issuer">
+        <input id="certFile" type="file" accept="image/*,application/pdf">
         <button id="addCert" class="btn">Add</button>
       </div>
     </section>
@@ -50,20 +47,14 @@
         <input id="projName" placeholder="Name">
         <input id="projDesc" placeholder="Desc">
         <input id="projUrl" placeholder="URL">
+        <input id="projFile" type="file" accept="image/*,video/*">
         <button id="addProj" class="btn">Add</button>
       </div>
     </section>
   </div>
 
-  <!-- Firebase v8 -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-  <!-- your firebase config -->
-  <script src="firebase.js"></script>
-
-  <!-- admin logic -->
-  <script src="admin.js"></script>
+  <script src="stars.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
+  <script src="../scripts/admin.js" defer></script>
 </body>
 </html>
