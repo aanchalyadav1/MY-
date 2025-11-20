@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Login — Portfolio</title>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Login</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
   <main class="login-wrap">
     <div class="card">
       <h2>Admin Login</h2>
-      <p>Sign in to manage certificates, internships and projects.</p>
+      <p>Sign in to manage site content.</p>
 
       <div class="actions">
         <button id="googleSign" class="btn">Sign in with Google</button>
@@ -27,60 +26,37 @@
         </div>
       </div>
 
-      <p class="note">After signing in, you will be checked against the admin list and redirected to the dashboard.</p>
+      <p class="note">After signing in, you'll be checked against admin list in Firestore.</p>
     </div>
   </main>
 
-  <!-- Firebase libs + config -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
   <script src="firebase.js"></script>
   <script>
-    // --- Google sign-in ---
-    const googleSign = document.getElementById('googleSign');
-    googleSign.addEventListener('click', ()=>{
+    document.getElementById('googleSign').addEventListener('click', ()=>{
       const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider).then(()=>{ /* handled in onAuthStateChanged */ }).catch(e=>alert(e.message));
+      firebase.auth().signInWithPopup(provider).catch(e=>alert(e.message));
     });
-
-    // --- Email sign-in / register ---
     document.getElementById('emailSign').addEventListener('click', async ()=>{
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try{
-        await firebase.auth().signInWithEmailAndPassword(email,password);
-      }catch(e){ alert(e.message); }
+      const email = document.getElementById('email').value, password = document.getElementById('password').value;
+      try{ await firebase.auth().signInWithEmailAndPassword(email,password); } catch(e){ alert(e.message); }
     });
     document.getElementById('emailReg').addEventListener('click', async ()=>{
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try{
-        await firebase.auth().createUserWithEmailAndPassword(email,password);
-        alert('Registered. You may now sign in. (You still need admin approval in Firestore)');
-      }catch(e){ alert(e.message); }
+      const email = document.getElementById('email').value, password = document.getElementById('password').value;
+      try{ await firebase.auth().createUserWithEmailAndPassword(email,password); alert('Registered. Ask site owner to add to admin list.'); } catch(e){ alert(e.message); }
     });
 
-    // --- on auth change: check admin list and redirect ---
     firebase.auth().onAuthStateChanged(async user=>{
       if(!user) return;
-      // simple admin check: we expect a document "admin/list" with field "emails": ["you@domain.com"]
       try{
         const adminDoc = await firebase.firestore().collection('admin').doc('list').get();
         const emails = adminDoc.exists && Array.isArray(adminDoc.data().emails) ? adminDoc.data().emails : [];
-        if(emails.includes(user.email)){
-          // ok — redirect to admin dashboard
-          window.location = 'admin.html';
-        } else {
-          alert('Account is not in admin list. Ask site owner to add your email to the admin list in Firestore.');
-          // optional: sign out
-          await firebase.auth().signOut();
-        }
-      }catch(e){
-        console.error(e);
-        alert('Error checking admin status. See console for details.');
-      }
+        if(emails.includes(user.email)) window.location = 'admin.html';
+        else { alert('Not in admin list.'); await firebase.auth().signOut(); }
+      }catch(e){ console.error(e); alert('Error checking admin'); }
     });
   </script>
 </body>
