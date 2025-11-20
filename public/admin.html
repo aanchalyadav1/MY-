@@ -8,14 +8,14 @@
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
-  <div class="card" style="max-width:980px;margin:22px auto;position:relative;z-index:3">
+  <div class="card container" style="max-width:980px;margin:22px auto;position:relative;z-index:3">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2>Admin Dashboard</h2>
+      <h2 style="color:var(--neon1);margin:0">Admin Dashboard</h2>
       <div><button id="signOut" class="btn-ghost">Sign out</button></div>
     </div>
 
     <section>
-      <h3>Certificates</h3>
+      <h3 style="color:var(--muted)">Certificates</h3>
       <div id="certList"></div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <input id="certTitle" placeholder="Title">
@@ -28,7 +28,7 @@
     <hr/>
 
     <section>
-      <h3>Internships</h3>
+      <h3 style="color:var(--muted)">Internships</h3>
       <div id="internList"></div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <input id="internCompany" placeholder="Company">
@@ -41,7 +41,7 @@
     <hr/>
 
     <section>
-      <h3>Projects</h3>
+      <h3 style="color:var(--muted)">Projects</h3>
       <div id="projectList"></div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <input id="projName" placeholder="Name">
