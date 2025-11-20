@@ -1,20 +1,19 @@
-// admin.js (v8) - expects firebase.js loaded first
+// scripts/admin.js (v8) - requires scripts/firebase.js loaded first
 const auth = window.auth || firebase.auth();
 const db = window.db || firebase.firestore();
 const storage = window.storage || firebase.storage();
 
-// UI
 const signOutBtn = document.getElementById('signOut');
-signOutBtn && signOutBtn.addEventListener('click', () => auth.signOut().then(()=>window.location='login.html'));
+if(signOutBtn) signOutBtn.addEventListener('click', () => auth.signOut().then(() => (window.location = 'login.html')));
 
+// UI Refs
 const certList = document.getElementById('certList');
 const internList = document.getElementById('internList');
 const projectList = document.getElementById('projectList');
 
-// inputs
 const certTitle = document.getElementById('certTitle');
 const certIssuer = document.getElementById('certIssuer');
-const certFile = document.getElementById('certFile'); // optional file input
+const certFile = document.getElementById('certFile');
 const addCert = document.getElementById('addCert');
 
 const internCompany = document.getElementById('internCompany');
@@ -25,62 +24,49 @@ const addIntern = document.getElementById('addIntern');
 const projName = document.getElementById('projName');
 const projDesc = document.getElementById('projDesc');
 const projUrl = document.getElementById('projUrl');
-const projFile = document.getElementById('projFile'); // optional file input for project preview
+const projFile = document.getElementById('projFile');
 const addProj = document.getElementById('addProj');
 
-// helper
-function escapeHtml(str){ return str ? str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
+function escapeHtml(str) { return str ? str.replace(/[&<>"']/g, t => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[t]) : ""; }
 
 async function isAdminEmail(email){
   try{
     const doc = await db.collection('admin').doc('list').get();
     const emails = doc.exists && Array.isArray(doc.data().emails) ? doc.data().emails : [];
     return emails.includes(email);
-  } catch(e){ console.error(e); return false; }
+  }catch(e){ console.error(e); return false; }
 }
 
 auth.onAuthStateChanged(async user=>{
-  if(!user){ window.location='login.html'; return; }
+  if(!user){ window.location = 'login.html'; return; }
   const ok = await isAdminEmail(user.email);
   if(!ok){ alert('Not authorized'); auth.signOut(); return; }
   loadAll();
 });
 
-// Load all
 async function loadAll(){ await Promise.all([renderCertificates(), renderInternships(), renderProjects()]); }
 
-/* ---------- Certificates ---------- */
+/* Certificates */
 async function renderCertificates(){
+  if(!certList) return;
   try{
     const doc = await db.collection('certificates').doc('list').get();
-    const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+    const items = doc.exists ? doc.data().items || [] : [];
     certList.innerHTML = items.length ? '' : '<p style="opacity:.8">No certificates</p>';
     items.forEach((c, idx)=>{
-      const row = document.createElement('div');
-      row.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin-top:8px";
-      const left = document.createElement('div');
-      left.innerHTML = `<strong>${escapeHtml(c.title)}</strong><div style="opacity:.9">${escapeHtml(c.issuer||'')}</div>`;
-      if(c.fileUrl){
-        const a = document.createElement('a');
-        a.href = c.fileUrl; a.target = '_blank'; a.style.display='block';
-        a.textContent = 'View';
-        left.appendChild(a);
-      }
-      const del = document.createElement('button');
-      del.className='btn-ghost'; del.textContent='Delete';
-      del.onclick = ()=>deleteCert(idx);
-      row.appendChild(left); row.appendChild(del);
+      const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-top:8px';
+      row.innerHTML = `<div><strong>${escapeHtml(c.title)}</strong><div style="opacity:.9">${escapeHtml(c.issuer||'')}</div></div>`;
+      const del = document.createElement('button'); del.textContent='Delete'; del.className='btn-ghost';
+      del.addEventListener('click', ()=>deleteCert(idx));
+      row.appendChild(del);
       certList.appendChild(row);
     });
-  }catch(e){ console.error(e); certList.innerHTML='<p>Error</p>'; }
+  }catch(e){ console.error(e); certList.innerHTML = '<p>Error</p>'; }
 }
 
-// Add certificate (with optional file upload)
-addCert && addCert.addEventListener('click', async ()=>{
-  const title = certTitle.value.trim();
-  const issuer = certIssuer.value.trim();
-  if(!title) return alert('Enter certificate title');
-  // optional file handling
+if(addCert) addCert.addEventListener('click', async ()=>{
+  const title = certTitle.value.trim(); const issuer = certIssuer.value.trim();
+  if(!title) return alert('Title required');
   let fileUrl = '';
   if(certFile && certFile.files && certFile.files[0]){
     const f = certFile.files[0];
@@ -91,7 +77,7 @@ addCert && addCert.addEventListener('click', async ()=>{
   }
   const docRef = db.collection('certificates').doc('list');
   const doc = await docRef.get();
-  const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+  const items = doc.exists ? doc.data().items || [] : [];
   items.push({ title, issuer, fileUrl });
   await docRef.set({ items });
   certTitle.value=''; certIssuer.value=''; if(certFile) certFile.value=null;
@@ -101,12 +87,95 @@ addCert && addCert.addEventListener('click', async ()=>{
 async function deleteCert(idx){
   const docRef = db.collection('certificates').doc('list');
   const doc = await docRef.get();
-  const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-  // optionally delete storage file? (skip here)
+  const items = doc.exists ? doc.data().items || [] : [];
   items.splice(idx,1);
   await docRef.set({ items });
   renderCertificates();
 }
+
+/* Internships */
+async function renderInternships(){
+  if(!internList) return;
+  try{
+    const doc = await db.collection('internships').doc('list').get();
+    const items = doc.exists ? doc.data().items || [] : [];
+    internList.innerHTML = items.length ? '' : '<p style="opacity:.8">No internships</p>';
+    items.forEach((i, idx)=>{
+      const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-top:8px';
+      row.innerHTML = `<div><strong>${escapeHtml(i.company)}</strong><div style="opacity:.9">${escapeHtml(i.role||'')} • ${escapeHtml(i.duration||'')}</div></div>`;
+      const del = document.createElement('button'); del.textContent='Delete'; del.className='btn-ghost';
+      del.addEventListener('click', ()=>deleteIntern(idx));
+      row.appendChild(del); internList.appendChild(row);
+    });
+  }catch(e){ console.error(e); internList.innerHTML = '<p>Error</p>'; }
+}
+
+if(addIntern) addIntern.addEventListener('click', async ()=>{
+  const company = internCompany.value.trim(); const role = internRole.value.trim(); const duration = internDuration.value.trim();
+  if(!company) return alert('Company required');
+  const docRef = db.collection('internships').doc('list');
+  const doc = await docRef.get();
+  const items = doc.exists ? doc.data().items || [] : [];
+  items.push({ company, role, duration });
+  await docRef.set({ items });
+  internCompany.value=''; internRole.value=''; internDuration.value='';
+  renderInternships();
+});
+
+async function deleteIntern(idx){
+  const docRef = db.collection('internships').doc('list');
+  const doc = await docRef.get();
+  const items = doc.exists ? doc.data().items || [] : [];
+  items.splice(idx,1);
+  await docRef.set({ items });
+  renderInternships();
+}
+
+/* Projects */
+async function renderProjects(){
+  if(!projectList) return;
+  try{
+    const doc = await db.collection('projects').doc('list').get();
+    const items = doc.exists ? doc.data().items || [] : [];
+    projectList.innerHTML = items.length ? '' : '<p style="opacity:.8">No projects</p>';
+    items.forEach((p, idx)=>{
+      const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-top:8px';
+      row.innerHTML = `<div><strong>${escapeHtml(p.name)}</strong><div style="opacity:.9">${escapeHtml(p.desc||'')}</div><a href="${escapeHtml(p.url||'')}" target="_blank" style="display:block;margin-top:6px">${escapeHtml(p.url||'')}</a></div>`;
+      const del = document.createElement('button'); del.textContent='Delete'; del.className='btn-ghost';
+      del.addEventListener('click', ()=>deleteProj(idx));
+      row.appendChild(del); projectList.appendChild(row);
+    });
+  }catch(e){ console.error(e); projectList.innerHTML = '<p>Error</p>'; }
+}
+
+if(addProj) addProj.addEventListener('click', async ()=>{
+  const name = projName.value.trim(); const desc = projDesc.value.trim(); const url = projUrl.value.trim();
+  if(!name) return alert('Project name required');
+  let fileUrl = '';
+  if(projFile && projFile.files && projFile.files[0]){
+    const f = projFile.files[0];
+    const path = `projects/${Date.now()}_${f.name}`;
+    const ref = storage.ref().child(path);
+    await ref.put(f);
+    fileUrl = await ref.getDownloadURL();
+  }
+  const docRef = db.collection('projects').doc('list');
+  const doc = await docRef.get();
+  const items = doc.exists ? doc.data().items || [] : [];
+  items.push({ name, desc, url, fileUrl });
+  await docRef.set({ items });
+  projName.value=''; projDesc.value=''; projUrl.value=''; if(projFile) projFile.value=null;
+  renderProjects();
+});
+
+async function deleteProj(idx){
+  const docRef = db.collection('projects').doc('list');
+  const doc = await docRef.get();
+  const items = doc.exists ? doc.data().items || [] : [];
+  items.splice(idx,1);
+  await docRef.set({ items });
+  renderProjects();
+                                                       }}
 
 /* ---------- Internships ---------- */
 async function renderInternships(){
