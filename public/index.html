@@ -6,17 +6,18 @@
   <title>Aanchal Yadav — Home</title>
   <meta name="description" content="Aanchal Yadav — AI, Cybersecurity, Web Developer" />
   <link rel="stylesheet" href="style.css">
-  <!-- optional firebase scripts (safe to keep) -->
+  <!-- firebase scripts (defer) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js" defer></script>
 </head>
 <body>
 
   <!-- small starfield -->
-  <canvas id="starsCanvas"></canvas>
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
-  <!-- top-right menu (certificates / internships / projects) -->
+  <!-- top-right menu -->
   <nav class="top-right-menu" aria-label="Primary">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
@@ -27,18 +28,10 @@
 
   <!-- Floating right circular nav -->
   <div class="float-nav" role="navigation" aria-label="Quick nav">
-    <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5L12 4l9 7.5" stroke="#e8fbff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">
-      <svg viewBox="0 0 24 24"><path fill="#e8fbff" d="M12 2l3 6 6 .5-4.5 3.9L18 22l-6-3-6 3 .5-9.6L2 8.5 8 8z"/></svg>
-    </button>
-    <button class="float-btn" data-href="internships.html" title="Internships" aria-label="Internships">
-      <svg viewBox="0 0 24 24"><path fill="#e8fbff" d="M3 7h18v2H3zM5 11h14v6H5z"/></svg>
-    </button>
-    <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">
-      <svg viewBox="0 0 24 24"><path fill="#e8fbff" d="M3 13h8v8H3zM13 3h8v8h-8zM13 13h8v8h-8z"/></svg>
-    </button>
+    <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">🏠</button>
+    <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">📜</button>
+    <button class="float-btn" data-href="internships.html" title="Internships" aria-label="Internships">💼</button>
+    <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">🧩</button>
   </div>
 
   <!-- HERO -->
@@ -90,18 +83,26 @@
 
           <!-- Social icons (animated) -->
           <div class="social-row">
-            <a href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" class="social-btn git" aria-label="GitHub">
-              <!-- GitHub svg -->
-              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.57.1.78-.25.78-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.12-3.04 0 0 .97-.31 3.18 1.19a11.08 11.08 0 012.9-.39c.98.01 1.97.13 2.9.39 2.21-1.5 3.17-1.19 3.17-1.19.64 1.58.24 2.75.12 3.04.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.68.41.36.77 1.07.77 2.17 0 1.57-.01 2.84-.01 3.23 0 .31.21.67.79.56A12 12 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
-            </a>
-            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" class="social-btn ln" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20.447 20.452H17.2V14.85c0-1.336-.027-3.053-1.863-3.053-1.867 0-2.154 1.454-2.154 2.955v5.7H9.935V9h3.112v1.561h.044c.434-.824 1.494-1.692 3.073-1.692 3.283 0 3.886 2.159 3.886 4.972v6.611zM5.337 7.433a1.82 1.82 0 110-3.638 1.82 1.82 0 010 3.638zM6.798 20.452H3.873V9h2.925v11.452z"/></svg>
-            </a>
+            <a href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" class="social-btn git" aria-label="GitHub">GitHub</a>
+            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
           </div>
 
         </div>
       </div>
     </header>
+
+    <!-- dynamic highlights (certs/projects preview) -->
+    <section class="preview-grid container">
+      <div>
+        <h4>Recent Certificates</h4>
+        <div id="previewCerts" class="list"></div>
+      </div>
+      <div>
+        <h4>Recent Projects</h4>
+        <div id="previewProjects" class="list"></div>
+      </div>
+    </section>
+
   </main>
 
   <!-- bottom nav (mobile) -->
@@ -114,27 +115,18 @@
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
-  <!-- scripts -->
+  <!-- local scripts -->
   <script src="stars.js" defer></script>
-  <script src="firebase.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
   <script src="auth.js" defer></script>
   <script src="script.js" defer></script>
 
   <script>
-    // float buttons navigate to pages
+    // float nav behaviour (keeps earlier)
     document.querySelectorAll('.float-btn').forEach(btn=>{
       btn.addEventListener('click', ()=> {
-        const href = btn.getAttribute('data-href') || btn.getAttribute('data-target');
-        if(href && href.endsWith('.html')) location.href = href;
-        else if(href) location.href = href;
-        else {
-          // if legacy data-target keys used, map them
-          const t = btn.getAttribute('data-target');
-          if(t === 'certs') location.href = 'certificates.html';
-          if(t === 'intern') location.href = 'internships.html';
-          if(t === 'projects') location.href = 'projects.html';
-          if(t === 'home') location.href = 'index.html';
-        }
+        const href = btn.getAttribute('data-href');
+        if(href) location.href = href;
       });
     });
   </script>
