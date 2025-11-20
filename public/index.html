@@ -6,7 +6,6 @@
   <title>Aanchal Yadav — Home</title>
   <meta name="description" content="Aanchal Yadav — AI, Cybersecurity, Web Developer" />
   <link rel="stylesheet" href="style.css">
-  <!-- firebase scripts (defer) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
@@ -14,10 +13,8 @@
 </head>
 <body>
 
-  <!-- small starfield -->
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
-  <!-- top-right menu -->
   <nav class="top-right-menu" aria-label="Primary">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
@@ -26,7 +23,6 @@
     <a href="login.html" class="trm-item admin-link">Admin</a>
   </nav>
 
-  <!-- Floating right circular nav -->
   <div class="float-nav" role="navigation" aria-label="Quick nav">
     <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">🏠</button>
     <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">📜</button>
@@ -34,12 +30,10 @@
     <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">🧩</button>
   </div>
 
-  <!-- HERO -->
   <main id="app" class="page fade-in">
     <header class="hero container">
       <div class="hero-inner">
 
-        <!-- Hologram (H3) -->
         <div class="holo-wrap" aria-hidden="false">
           <div class="ring r1"></div>
           <div class="ring r2"></div>
@@ -59,7 +53,6 @@
           </div>
         </div>
 
-        <!-- Intro + About -->
         <div class="hero-text">
           <div class="hero-title">Hey there! I’m Aanchal Yadav</div>
           <div class="hero-sub">AI • Cybersecurity • Web Developer</div>
@@ -67,46 +60,42 @@
           <div class="hero-intro">
             <p>I’m a 3rd-year Computer Science Engineering student at Sushila Devi Bansal College of Engineering, Indore — passionate about Artificial Intelligence, Cybersecurity, and everything tech!</p>
 
-            <p style="margin-top:12px">Over the last few months, I’ve been exploring the real-world side of what we study in class by doing multiple virtual internships, earning certifications, and working on projects that bring theory to life. Whether it's building an AI model, designing a webpage, or hiding data securely in images (yes, really!), I love learning by doing.</p>
+            <p style="margin-top:12px">Over the last few months, I’ve been exploring the real-world side of what we study in class by doing multiple virtual internships, earning certifications, and working on projects that bring theory to life.</p>
 
-            <p style="margin-top:12px">Some things I’ve enjoyed working on:</p>
-            <ul style="margin-top:8px;line-height:1.6">
-              <li>🎨 Image Generation using Stable Diffusion &amp; Comfy UI</li>
-              <li>🔒 Secure Data Hiding using Steganography</li>
-              <li>🍿 Movie Recommendation System using ML</li>
-              <li>🌐 Personal Interactive Webpage with HTML, CSS &amp; JS</li>
-              <li>💡 Generative AI projects through prompt engineering</li>
-            </ul>
-
-            <p style="margin-top:12px">I’ve completed certifications from IBM, Microsoft, Google, Cisco, HP LIFE, and more — all helping me grow.</p>
+            <div class="social-row">
+              <a href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" class="social-btn git" aria-label="GitHub">GitHub</a>
+              <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
+            </div>
           </div>
-
-          <!-- Social icons (animated) -->
-          <div class="social-row">
-            <a href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" class="social-btn git" aria-label="GitHub">GitHub</a>
-            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
-          </div>
-
         </div>
       </div>
     </header>
 
-    <!-- dynamic highlights (certs/projects preview) -->
     <section class="preview-grid container">
       <div>
-        <h4>Recent Certificates</h4>
+        <h4 style="color:var(--muted)">Recent Certificates</h4>
         <div id="previewCerts" class="list"></div>
       </div>
       <div>
-        <h4>Recent Projects</h4>
+        <h4 style="color:var(--muted)">Recent Projects</h4>
         <div id="previewProjects" class="list"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- bottom nav (mobile) -->
-  <nav class="bottom-nav" aria-label="Bottom">
+  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
+
+  <script src="stars.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
+  <script src="script.js" defer></script>
+  <script>
+    document.querySelectorAll('.float-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> { const href = btn.getAttribute('data-href'); if(href) location.href = href; });
+    });
+  </script>
+</body>
+</html>  <nav class="bottom-nav" aria-label="Bottom">
     <a href="index.html" class="bn">Home</a>
     <a href="certificates.html" class="bn">Certificates</a>
     <a href="internships.html" class="bn">Internships</a>
