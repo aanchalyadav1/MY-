@@ -4,7 +4,6 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
@@ -18,26 +17,35 @@ const requiredEnv = [
 for (const v of requiredEnv) {
   if (!process.env[v]) {
     console.error(`ERROR: Missing environment variable ${v}`);
-    process.exit(1); // exit immediately if any key is missing
+    process.exit(1);
   }
 }
 
 // --------------------- FIREBASE INITIALIZATION ---------------------
-// Ensure that in Render, FIREBASE_PRIVATE_KEY uses real line breaks
-// Not literal \n
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  }),
-});
+// Handles both literal \n and real line breaks
+let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+if (!privateKey.startsWith("-----BEGIN")) {
+  // replace literal \n with real newlines
+  privateKey = privateKey.replace(/\\n/g, "\n");
+}
+
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey,
+    }),
+  });
+  console.log("✅ Firebase initialized successfully");
+} catch (err) {
+  console.error("❌ Firebase initialization failed:", err);
+  process.exit(1);
+}
 
 const db = admin.firestore();
 
 // --------------------- ROUTES ---------------------
-
-// Save profile data
 app.post("/saveProfile", async (req, res) => {
   try {
     await db.collection("profile").doc("main").set(req.body);
@@ -48,7 +56,6 @@ app.post("/saveProfile", async (req, res) => {
   }
 });
 
-// Save certificates
 app.post("/saveCertificates", async (req, res) => {
   try {
     await db.collection("certificates").doc("list").set(req.body);
@@ -59,7 +66,6 @@ app.post("/saveCertificates", async (req, res) => {
   }
 });
 
-// Save internships
 app.post("/saveInternships", async (req, res) => {
   try {
     await db.collection("internships").doc("list").set(req.body);
@@ -70,7 +76,6 @@ app.post("/saveInternships", async (req, res) => {
   }
 });
 
-// Save projects
 app.post("/saveProjects", async (req, res) => {
   try {
     await db.collection("projects").doc("list").set(req.body);
@@ -81,7 +86,6 @@ app.post("/saveProjects", async (req, res) => {
   }
 });
 
-// Auto import GitHub projects
 app.get("/fetchGithub/:username", async (req, res) => {
   try {
     const url = `https://api.github.com/users/${req.params.username}/repos`;
@@ -93,7 +97,6 @@ app.get("/fetchGithub/:username", async (req, res) => {
   }
 });
 
-// LinkedIn certificate scraper placeholder
 app.get("/fetchLinkedIn/:id", async (req, res) => {
   res.send({
     message: "Scraping LinkedIn requires an external server like Puppeteer.",
