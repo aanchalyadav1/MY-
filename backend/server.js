@@ -7,11 +7,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const serviceAccount = require("./serviceAccount.json");
-
+// Use environment variables instead of serviceAccount.json
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  }),
 });
+
 const db = admin.firestore();
 
 // --------------------- SAVE PROFILE DATA ---------------------
@@ -56,4 +60,5 @@ app.get("/fetchLinkedIn/:id", async (req, res) => {
   });
 });
 
-app.listen(5000, () => console.log("Backend running on port 5000"));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
