@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aanchal Yadav — Portfolio</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Firebase v8 (compatible with your code) -->
+
+  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
@@ -13,6 +14,16 @@
 
   <!-- Galaxy Canvas -->
   <canvas id="galaxyCanvas"></canvas>
+
+  <!-- Floating social: GitHub cube (left) -->
+  <div id="githubCube" aria-hidden="true">
+    <div class="cube-face face-front"><svg viewBox="0 0 24 24"><path fill="white" d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.57.1.78-.25.78-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.12-3.04 0 0 .97-.31 3.18 1.19a11.08 11.08 0 012.9-.39c.98.01 1.97.13 2.9.39 2.21-1.5 3.17-1.19 3.17-1.19.64 1.58.24 2.75.12 3.04.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.68.41.36.77 1.07.77 2.17 0 1.57-.01 2.84-.01 3.23 0 .31.21.67.79.56A12 12 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></div>
+  </div>
+
+  <!-- Floating LinkedIn button (right) -->
+  <a id="linkedinFloat" href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" aria-label="LinkedIn">
+    <svg class="ln-svg" viewBox="0 0 24 24"><path fill="white" d="M20.447 20.452H17.2V14.85c0-1.336-.027-3.053-1.863-3.053-1.867 0-2.154 1.454-2.154 2.955v5.7H9.935V9h3.112v1.561h.044c.434-.824 1.494-1.692 3.073-1.692 3.283 0 3.886 2.159 3.886 4.972v6.611zM5.337 7.433a1.82 1.82 0 110-3.638 1.82 1.82 0 010 3.638zM6.798 20.452H3.873V9h2.925v11.452z"/></svg>
+  </a>
 
   <!-- NAV -->
   <nav class="navbar">
@@ -25,69 +36,65 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-inner">
-      <div class="profile-wrap">
+  <!-- LUXURY HERO -->
+  <header class="hero luxury">
+    <div class="lux-card">
+      <div class="lux-left">
         <div class="profile-holo">
           <img id="profilePic" src="assets/profile.jpg" alt="Aanchal">
-          <div class="holo-glow"></div>
+          <div class="holo-over"></div>
+        </div>
+        <div class="social-inline">
+          <!-- hero inline social (icons) -->
+          <a class="social-inline-btn" href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" aria-label="GitHub">
+            <!-- small cube 2D icon -->
+            <svg viewBox="0 0 24 24"><path fill="white" d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.57.1.78-.25.78-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.12-3.04 0 0 .97-.31 3.18 1.19a11.08 11.08 0 012.9-.39c.98.01 1.97.13 2.9.39 2.21-1.5 3.17-1.19 3.17-1.19.64 1.58.24 2.75.12 3.04.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.68.41.36.77 1.07.77 2.17 0 1.57-.01 2.84-.01 3.23 0 .31.21.67.79.56A12 12 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+            GitHub
+          </a>
+
+          <a class="social-inline-btn linkedin-inline" href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg class="ln-sm" viewBox="0 0 24 24"><path fill="white" d="M20.447 20.452H17.2V14.85c0-1.336-.027-3.053-1.863-3.053-1.867 0-2.154 1.454-2.154 2.955v5.7H9.935V9h3.112v1.561h.044c.434-.824 1.494-1.692 3.073-1.692 3.283 0 3.886 2.159 3.886 4.972v6.611zM5.337 7.433a1.82 1.82 0 110-3.638 1.82 1.82 0 010 3.638zM6.798 20.452H3.873V9h2.925v11.452z"/></svg>
+            LinkedIn
+          </a>
         </div>
       </div>
 
-      <div class="hero-copy">
-        <h1 class="hero-title">Hi, I’m <span>Aanchal Yadav</span></h1>
-        <p class="hero-desc">AI Enthusiast • Cybersecurity Learner • Web Developer</p>
+      <div class="lux-right">
+        <h1 class="lux-title">Aanchal <span>Yadav</span></h1>
+        <p class="lux-sub">AI • Cybersecurity • Web Developer</p>
 
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="https://github.com/aanchalyadav1" target="_blank">GitHub</a>
-          <a class="btn btn-ghost" href="https://www.linkedin.com/in/aanchal" target="_blank">LinkedIn</a>
+        <p class="lux-intro">I build AI-powered tools and secure web experiences. I love automating workflows and creating clean, futuristic UI.</p>
+
+        <div class="lux-cta">
+          <a class="btn-primary" href="mailto:example@example.com">Contact</a>
+          <a class="btn-outline" href="login.html">Admin</a>
         </div>
       </div>
     </div>
-    <div class="scroll-hint" onclick="scrollToSection('certificates')">Scroll ↓</div>
   </header>
 
-  <!-- SECTIONS -->
+  <!-- CONTENT SECTIONS -->
   <main>
-    <section id="certificates" class="section">
-      <div class="section-inner" id="certificatesInner"></div>
-    </section>
-
-    <section id="internships" class="section">
-      <div class="section-inner" id="internshipsInner"></div>
-    </section>
-
-    <section id="projects" class="section">
-      <div class="section-inner" id="projectsInner"></div>
-    </section>
+    <section id="certificates" class="section"><div class="section-inner" id="certificatesInner"></div></section>
+    <section id="internships" class="section"><div class="section-inner" id="internshipsInner"></div></section>
+    <section id="projects" class="section"><div class="section-inner" id="projectsInner"></div></section>
   </main>
 
-  <!-- Firebase config (frontend) -->
+  <!-- Firebase (frontend) -->
   <script src="firebase.js"></script>
 
-  <!-- App logic -->
+  <!-- app logic -->
   <script src="script.js"></script>
 
-  <!-- Stars animation -->
+  <!-- stars animation -->
   <script src="stars.js"></script>
 
-  <!-- Hologram micro-interaction -->
+  <!-- floating controls behavior -->
   <script>
-    (function(){
-      const profile = document.getElementById('profilePic');
-      if(!profile) return;
-      document.addEventListener('mousemove', e => {
-        const rect = profile.getBoundingClientRect();
-        const cx = rect.left + rect.width/2;
-        const cy = rect.top + rect.height/2;
-        const dx = (e.clientX - cx)/25;
-        const dy = (e.clientY - cy)/25;
-        profile.style.transform = `translate(${dx}px, ${dy}px) rotateX(${dy}deg) rotateY(${dx}deg)`;
-      });
-      document.addEventListener('mouseleave', () => profile.style.transform = '');
-    })();
+    // Github cube click -> go to your GitHub
+    document.getElementById('githubCube').addEventListener('click', () => {
+      window.open('https://github.com/aanchalyadav1', '_blank');
+    });
   </script>
-
 </body>
 </html>
