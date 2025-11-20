@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard — Portfolio</title>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Dashboard</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -14,11 +14,9 @@
       </div>
     </div>
 
-    <p style="opacity:.9">Manage content for Certificates, Internships and Projects. Changes update Firestore immediately.</p>
-
+    <p style="opacity:.9">Manage Certificates, Internships and Projects.</p>
     <hr style="margin:12px 0"/>
 
-    <!-- Certificates -->
     <section>
       <h3>Certificates</h3>
       <div id="certList"></div>
@@ -31,7 +29,6 @@
 
     <hr/>
 
-    <!-- Internships -->
     <section>
       <h3>Internships</h3>
       <div id="internList"></div>
@@ -45,7 +42,6 @@
 
     <hr/>
 
-    <!-- Projects -->
     <section>
       <h3>Projects</h3>
       <div id="projectList"></div>
@@ -59,7 +55,6 @@
 
   </div>
 
-  <!-- Firebase libs + config -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
