@@ -4,9 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aanchal Yadav — Portfolio</title>
+
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+  <!-- Firebase v8 (works with firebase.firestore()) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 
 <body>
@@ -31,7 +34,10 @@
   <section id="internships"></section>
   <section id="projects"></section>
 
-  <script src="../firebase.js"></script>
+  <!-- Load Firebase config (must be inside /public folder) -->
+  <script src="firebase.js"></script>
+
+  <!-- Portfolio script -->
   <script src="script.js"></script>
 
 </body>
