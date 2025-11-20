@@ -6,28 +6,38 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
 </head>
 <body>
-  <div style="max-width:420px;margin:80px auto;padding:22px" class="card">
-    <h2 style="color:var(--neon1)">Admin Login</h2>
-    <p style="color:var(--muted)">Sign in to manage certificates, internships & projects.</p>
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
+  <nav class="top-right-menu" aria-label="Primary"><a href="index.html" class="trm-item">Home</a></nav>
 
-    <div style="margin-top:16px;display:flex;gap:8px;flex-direction:column">
-      <button id="googleSign" class="btn">Sign in with Google</button>
+  <div class="login-wrap">
+    <div class="login-card card">
+      <h2 style="color:var(--neon1);margin:0 0 8px 0">Admin Login</h2>
+      <p style="color:var(--muted);margin:0 0 12px 0">Sign in to manage Certificates, Internships & Projects.</p>
 
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="email" placeholder="Email" style="flex:1">
-        <input id="pass" placeholder="Password" type="password" style="flex:1">
+      <div style="display:flex;gap:8px;flex-direction:column;margin-top:10px">
+        <button id="googleSign" class="btn">Sign in with Google</button>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="email" placeholder="Email" type="email">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="pass" placeholder="Password" type="password">
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="emailSign" class="btn">Sign In</button>
+          <button id="emailCreate" class="btn-ghost">Create</button>
+        </div>
+
+        <p style="color:var(--muted);margin-top:10px;font-size:13px">Only emails listed in the Firestore `admin/list` doc can access admin features.</p>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="emailSign" class="btn">Sign In</button>
-        <button id="emailCreate" class="btn-ghost">Create</button>
-      </div>
-
-      <p style="color:var(--muted);margin-top:10px;font-size:13px">Only emails listed in the Firestore `admin/list` doc are permitted.</p>
     </div>
   </div>
 
+  <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', ()=>{
