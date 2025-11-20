@@ -1,101 +1,130 @@
-// stars.js — medium density 3D-feel meteor shower + layered twinkling stars
+// stars.js
+// Galaxy-style rotating starfield with radial shooting meteors
 (() => {
   const canvas = document.getElementById('starsCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d', { alpha: true });
 
-  // DPR handling
+  // DPR and sizing
   let DPR = Math.max(1, window.devicePixelRatio || 1);
-  let W = innerWidth, H = innerHeight;
-  function resize() {
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+
+  function sizeCanvas() {
     DPR = Math.max(1, window.devicePixelRatio || 1);
-    W = canvas.width = Math.round(innerWidth * DPR);
-    H = canvas.height = Math.round(innerHeight * DPR);
-    canvas.style.width = innerWidth + 'px';
-    canvas.style.height = innerHeight + 'px';
+    W = Math.max(300, window.innerWidth);
+    H = Math.max(200, window.innerHeight);
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
-  resize();
+  sizeCanvas();
 
-  // Layers for parallax / depth
+  // center coordinates for galaxy
+  function center() { return { x: W / 2, y: H / 2 }; }
+
+  // parameters (tweakable)
+  const BASE = Math.max(100, Math.floor((W * H) / 14000)); // base star count scale
   const LAYERS = [
-    { countFactor: 0.45, speed: 0.25, size: 0.7, alpha: 0.6, hueRange: [200, 220] }, // distant bluish
-    { countFactor: 0.35, speed: 0.6, size: 1.0, alpha: 0.8, hueRange: [200, 240] },  // mid
-    { countFactor: 0.2,  speed: 1.2, size: 1.6, alpha: 1.0, hueRange: [260, 300] }   // near purple/white
+    { depth: 0.35, count: Math.round(BASE * 0.6), size: 0.5, twinkle: 0.004, hueRange: [200, 230], speedMult: 0.02 },
+    { depth: 0.45, count: Math.round(BASE * 0.9), size: 0.9, twinkle: 0.006, hueRange: [220, 260], speedMult: 0.05 },
+    { depth: 0.2,  count: Math.round(BASE * 0.5), size: 1.6, twinkle: 0.01, hueRange: [260, 300], speedMult: 0.12 }
   ];
 
-  const BASE_STARS = Math.max(110, Math.floor((innerWidth * innerHeight) / 12000));
+  // performance clamps
+  const MAX_METEORS = 10;
+  const METEOR_SPAWN_BASE_MS = 700; // base interval (randomized)
+  let lastMeteorSpawn = 0;
+
+  // particle arrays
   const stars = [];
+  const meteors = [];
 
-  function rand(min, max) { return Math.random() * (max - min) + min; }
-  function choice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  // utility
+  const rand = (a, b) => Math.random() * (b - a) + a;
+  const choice = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  // create layered stars
-  function initStars() {
+  // create galaxy stars arranged on spiral arms for orbital motion
+  function makeGalaxy() {
     stars.length = 0;
+    const { x: cx, y: cy } = center();
+    const arms = 3;                // number of spiral arms
+    const armSeparation = (Math.PI * 2) / arms;
+    const maxRadius = Math.min(W, H) * 0.55;
     for (let li = 0; li < LAYERS.length; li++) {
       const layer = LAYERS[li];
-      const count = Math.round(BASE_STARS * layer.countFactor);
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < layer.count; i++) {
+        // place star along spiral arm with some noise
+        const arm = i % arms;
+        const radius = Math.pow(Math.random(), 0.9) * maxRadius * layer.depth * (0.7 + Math.random() * 0.6);
+        const baseAngle = arm * armSeparation + radius * 0.005 + rand(-0.6, 0.6); // spiral curvature
+        const angle = baseAngle + rand(-0.4, 0.4);
+        const hue = rand(layer.hueRange[0], layer.hueRange[1]);
         stars.push({
           layer: li,
-          x: Math.random() * innerWidth,
-          y: Math.random() * innerHeight,
-          baseR: rand(0.3, layer.size),
-          r: 0,
-          alpha: rand(0.15, layer.alpha * 0.9),
-          twinkleSpeed: rand(0.002, 0.012),
-          phase: Math.random() * Math.PI * 2,
-          hue: rand(layer.hueRange[0], layer.hueRange[1]),
-          driftX: rand(-0.03, 0.03) * layer.speed,
-          driftY: rand(-0.02, 0.02) * layer.speed
+          rbase: layer.size * (0.6 + Math.random() * 1.2),
+          hue,
+          alpha: rand(0.12, 0.95),
+          twinkleSpd: layer.twinkle * (0.6 + Math.random() * 1.2),
+          radius,
+          angle,
+          orbitSpeed: (0.0008 + Math.random() * 0.0016) * (1 + layer.speedMult),
+          cx,
+          cy,
+          offsetX: rand(-8, 8) * layer.depth,
+          offsetY: rand(-6, 6) * layer.depth
         });
       }
     }
   }
 
-  // Meteors structure
-  const meteors = [];
-  // medium spawn: between 0.06 and 0.12 per frame chance, but controlled by timer for smoothing
-  let meteorTimer = 0;
+  // meteor spawn: radial from near-center with random angle and outward velocity
+  function spawnMeteorRadial() {
+    if (meteors.length > MAX_METEORS) return;
+    const { x: cx, y: cy } = center();
+    // spawn near center with jitter
+    const sx = cx + rand(-W * 0.06, W * 0.06);
+    const sy = cy + rand(-H * 0.06, H * 0.06);
 
-  function spawnMeteor() {
-    // spawn from a random edge above the top, with angled direction across screen
-    const fromLeft = Math.random() < 0.65;
-    const startX = fromLeft ? rand(-innerWidth * 0.2, innerWidth * 0.2) : rand(innerWidth * 0.6, innerWidth * 1.2);
-    const startY = rand(-innerHeight * 0.15, innerHeight * 0.05);
-
-    // length, speed, tilt — varied for 3D effect
-    const length = rand(160, 420);            // pixel trail length
-    const speed = rand(10, 20);               // base speed
-    const angle = (fromLeft ? rand(18, 26) : rand(154, 166)) * (Math.PI / 180); // slight angle
-    const huePick = Math.random();
-    // bluish/purple favored; sometimes golden
-    const color = huePick < 0.7
-      ? { hue: rand(200, 230), sat: 85, light: 70 }   // bluish
-      : { hue: rand(40, 55), sat: 95, light: 60 };    // gold
+    // choose radial direction (aim mostly outward)
+    const angle = rand(0, Math.PI * 2);
+    // speed and length tuned to 3D look
+    const speed = rand(10, 26); // px per tick-ish
+    const length = rand(160, 420);
+    const thickness = rand(1.2, 3.4);
+    // color: mostly bluish/purple, sometimes golden
+    const hue = Math.random() < 0.72 ? rand(200, 240) : rand(35, 55);
+    const sat = hue > 100 ? 85 : 96;
+    const light = hue > 100 ? 72 : 62;
 
     meteors.push({
-      x: startX,
-      y: startY,
+      x: sx,
+      y: sy,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
+      vxVar: rand(-1.2, 1.2), // slight drift
+      vyVar: rand(-0.6, 0.6),
       length,
       life: 0,
-      maxLife: rand(60, 120),
-      color,
-      thickness: rand(1.4, 3.4),
-      blur: rand(8, 26)
+      maxLife: rand(80, 160),
+      thickness,
+      hue,
+      sat,
+      light,
+      trail: []
     });
-    // keep list trimmed
-    if (meteors.length > 12) meteors.shift();
+
+    // keep list manageable
+    if (meteors.length > MAX_METEORS) meteors.shift();
   }
 
-  // helper: soft radial brush
-  function softCircle(x, y, r, h, s, l, a) {
+  // draw helper: soft radial fill
+  function softRad(x, y, r, hue, sat, light, a) {
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, `hsla(${h},${s}%,${l}%,${a})`);
-    g.addColorStop(1, `rgba(0,0,0,0)`);
+    g.addColorStop(0, `hsla(${hue},${sat}%,${light}%,${a})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -104,194 +133,146 @@
 
   // render loop
   let last = performance.now();
-  function render(now) {
+  function tick(now) {
     const dt = Math.min(40, now - last);
     last = now;
 
     // clear
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.clearRect(0, 0, W, H);
 
-    // subtle nebula background (for depth)
-    const neb = ctx.createRadialGradient(innerWidth * 0.2, innerHeight * 0.15, 0, innerWidth * 0.6, innerHeight * 0.6, Math.max(innerWidth, innerHeight));
-    neb.addColorStop(0, 'rgba(90,36,200,0.02)');
-    neb.addColorStop(0.4, 'rgba(8,12,24,0.02)');
-    neb.addColorStop(1, 'rgba(8,12,24,0)');
+    // faint nebula / glow centered
+    const { x: cx, y: cy } = center();
+    const neb = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.9);
+    neb.addColorStop(0, 'rgba(120,40,200,0.02)');
+    neb.addColorStop(0.4, 'rgba(6,10,20,0.02)');
+    neb.addColorStop(1, 'rgba(6,10,20,0)');
     ctx.fillStyle = neb;
-    ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.fillRect(0, 0, W, H);
 
-    // update & draw stars
-    const t = now * 0.001;
+    // update and draw stars (orbit around center)
+    const time = now * 0.001;
     for (let s of stars) {
+      // orbital angle update
+      s.angle += s.orbitSpeed * dt;
+      // radial wobble for 3D feel
+      const wobble = Math.sin(time * (0.8 + s.orbitSpeed * 120) + s.radius * 0.02) * (0.6 + s.layer * 0.3);
+      const x = s.cx + (s.radius + wobble) * Math.cos(s.angle) + s.offsetX;
+      const y = s.cy + (s.radius + wobble) * Math.sin(s.angle) + s.offsetY;
+
       // twinkle
-      s.phase += s.twinkleSpeed * (dt * 0.07);
-      const tw = 0.5 + 0.5 * Math.sin(s.phase + t * 1.2);
-      const alpha = s.alpha * (0.6 + 0.4 * tw);
+      s.alpha = Math.max(0.06, Math.min(1, s.alpha + Math.sin(time * 3 + s.radius) * s.twinkleSpd));
 
-      // slight movement/drift for parallax illusion
-      s.x += s.driftX * (dt * 0.03);
-      s.y += s.driftY * (dt * 0.03);
-      // wrap
-      if (s.x < -10) s.x = innerWidth + 10;
-      if (s.x > innerWidth + 10) s.x = -10;
-      if (s.y < -10) s.y = innerHeight + 10;
-      if (s.y > innerHeight + 10) s.y = -10;
-
-      // core
+      // draw core
       ctx.beginPath();
-      ctx.fillStyle = `hsla(${s.hue},85%,85%,${alpha})`;
-      ctx.arc(s.x, s.y, s.baseR, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${Math.floor(s.hue)},85%,85%,${s.alpha})`;
+      ctx.arc(x, y, s.rbase, 0, Math.PI * 2);
       ctx.fill();
 
       // small halo
-      const haloR = s.baseR * 6;
-      const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, haloR);
-      halo.addColorStop(0, `hsla(${s.hue},85%,70%,${alpha * 0.12})`);
-      halo.addColorStop(1, `rgba(0,0,0,0)`);
+      const hr = s.rbase * 6;
+      const halo = ctx.createRadialGradient(x, y, 0, x, y, hr);
+      halo.addColorStop(0, `hsla(${Math.floor(s.hue)},85%,70%,${s.alpha * 0.12})`);
+      halo.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = halo;
-      ctx.fillRect(s.x - haloR, s.y - haloR, haloR * 2, haloR * 2);
+      ctx.fillRect(x - hr, y - hr, hr * 2, hr * 2);
     }
 
-    // draw meteors (back-to-front)
-    for (let i = 0; i < meteors.length; i++) {
-      const m = meteors[i];
+    // update and draw meteors: radial outward with curved trails (3D feel)
+    for (let mi = meteors.length - 1; mi >= 0; mi--) {
+      const m = meteors[mi];
       m.life += dt * 0.06;
+
+      // apply slight drift / curvature to vx/vy using vxVar/vyVar and external noise
+      m.vx += (Math.sin(time + m.life * 0.02) * m.vxVar) * 0.002 * dt;
+      m.vy += (Math.cos(time * 1.2 + m.life * 0.015) * m.vyVar) * 0.0018 * dt;
+
       // move
       m.x += m.vx * (dt * 0.06);
       m.y += m.vy * (dt * 0.06);
 
-      // 3D-feel tapered trail: use path + gradient
-      const angle = Math.atan2(m.vy, m.vx);
+      // push to trail (keep limited)
+      m.trail.unshift({ x: m.x, y: m.y, age: 0 });
+      if (m.trail.length > 40) m.trail.length = 40;
+
+      // draw trail (tapered, fading)
       ctx.save();
-      ctx.translate(m.x, m.y);
-      ctx.rotate(angle);
-      // tail gradient (long and soft)
-      const tailGrad = ctx.createLinearGradient(0, 0, -m.length, 0);
-      // head
-      tailGrad.addColorStop(0, `hsla(${m.color.hue},${m.color.sat}%,${m.color.light}%,1)`);
-      tailGrad.addColorStop(0.15, `hsla(${m.color.hue},${m.color.sat}%,${m.color.light - 8}%,0.75)`);
-      tailGrad.addColorStop(0.45, `hsla(${m.color.hue},${m.color.sat}%,${m.color.light - 18}%,0.28)`);
-      tailGrad.addColorStop(1, 'rgba(0,0,0,0)');
-
-      // soft blurred trail rectangle (wider near head, tapered)
       ctx.globalCompositeOperation = 'lighter';
-      ctx.fillStyle = tailGrad;
-
-      // use a tapered polygon for a better 3D shape
-      ctx.beginPath();
-      const wHead = m.thickness * 4;
-      const wTail = Math.max(1, m.thickness * 0.4);
-      ctx.moveTo(0, -wHead);
-      ctx.lineTo(-m.length, -wTail * 0.6);
-      ctx.lineTo(-m.length, wTail * 0.6);
-      ctx.lineTo(0, wHead);
-      ctx.closePath();
-      ctx.fill();
-
-      // add subtle streak lines inside trail for motion
-      const lines = 3;
-      for (let li = 0; li < lines; li++) {
+      const trailLen = m.trail.length;
+      for (let t = 0; t < trailLen; t++) {
+        const p = m.trail[t];
+        const tRatio = t / trailLen;
+        const alpha = Math.max(0, (1 - tRatio) * 0.55);
+        const rad = Math.max(1, (1 - tRatio) * m.thickness * 6);
+        // color fade: head bright, tail softer
+        const hue = m.hue;
+        const sat = m.sat;
+        const light = m.light;
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 1.8);
+        g.addColorStop(0, `hsla(${hue},${sat}%,${light}%,${alpha})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
         ctx.beginPath();
-        ctx.lineWidth = Math.max(1, m.thickness * (0.4 - li * 0.08));
-        ctx.strokeStyle = `hsla(${m.color.hue},${m.color.sat}%,${m.color.light}%,${0.18 - li * 0.04})`;
-        ctx.moveTo(rand(-m.length * 0.05, -m.length * 0.1), rand(-1, 1));
-        ctx.lineTo(-m.length * (0.4 + Math.random() * 0.45), rand(-1.5, 1.5));
-        ctx.stroke();
+        ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      // bright head glow
-      softCircle(6, 0, m.thickness * 6, m.color.hue, m.color.sat, m.color.light + 5, 0.95);
-      // sharp head
+      // head: small bright core
       ctx.beginPath();
-      ctx.fillStyle = `hsla(${m.color.hue},${m.color.sat}%,${m.color.light}%,1)`;
-      ctx.arc(6, 0, Math.max(1.2, m.thickness * 1.6), 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${m.hue},${m.sat}%,${m.light}%,1)`;
+      ctx.arc(m.x, m.y, Math.max(1.2, m.thickness * 1.6), 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.restore();
       ctx.globalCompositeOperation = 'source-over';
-    }
+      ctx.restore();
 
-    // spawn control: medium density — average spawn ~ every 700-1100ms with randomness
-    meteorTimer += dt;
-    if (meteorTimer > (500 + Math.random() * 700)) {
-      // spawn 1 or sometimes 2 for visual variety
-      spawnMeteor();
-      if (Math.random() < 0.15) spawnMeteor();
-      meteorTimer = 0;
-    }
-
-    // remove meteors that are off-screen or exceed life
-    for (let i = meteors.length - 1; i >= 0; i--) {
-      const m = meteors[i];
-      if (m.x < -innerWidth * 0.5 || m.x > innerWidth * 1.5 || m.y > innerHeight * 1.5 || m.life > m.maxLife) {
-        meteors.splice(i, 1);
+      // cull meteor if life/time off-screen
+      if (m.life > m.maxLife || m.x < -W * 0.5 || m.x > W * 1.5 || m.y < -H * 0.5 || m.y > H * 1.5) {
+        meteors.splice(mi, 1);
       }
     }
 
-    requestAnimationFrame(render);
+    // spawn new meteors at a medium pace, but with some randomness
+    if (now - lastMeteorSpawn > METEOR_SPAWN_BASE_MS * (0.6 + Math.random() * 1.6)) {
+      spawnMeteorRadial();
+      // sometimes spawn second to keep variety
+      if (Math.random() < 0.18) spawnMeteorRadial();
+      lastMeteorSpawn = now;
+    }
+
+    requestAnimationFrame(tick);
   }
 
-  // initialize
+  // init and resize handling
   function init() {
-    resize();
-    initStars();
+    sizeCanvas();
+    makeGalaxy();
     meteors.length = 0;
     last = performance.now();
-    requestAnimationFrame(render);
+    lastMeteorSpawn = performance.now();
+    requestAnimationFrame(tick);
   }
 
-  // handle resize & visibility
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(init, 120);
-  });
+  // reduce complexity on small screens for perf
+  function adaptForSmall() {
+    if (W < 600 || H < 600) {
+      // lower star counts and meteor frequency
+      LAYERS.forEach((l) => { l.count = Math.max(20, Math.round(l.count * 0.6)); l.speedMult *= 0.8; l.twinkle *= 1.1; });
+    }
+  }
 
-  // pause when tab not visible (saves battery)
+  // resize debounce
+  let rT;
+  window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { init(); adaptForSmall(); }, 140); });
+
+  // pause when tab not visible
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       last = performance.now();
+      lastMeteorSpawn = performance.now();
+      requestAnimationFrame(tick);
     }
   });
 
+  // initial run
   init();
-})();      ctx.translate(m.x, m.y);
-      ctx.rotate(angle);
-      const grad = ctx.createLinearGradient(0,0, -m.length,0);
-      // head bright
-      grad.addColorStop(0, `hsla(${m.hue},${m.sat}%,70%,1)`);
-      grad.addColorStop(0.25, `hsla(${m.hue},${m.sat}%,65%,0.6)`);
-      grad.addColorStop(0.7, `hsla(${m.hue},${m.sat}%,50%,0.12)`);
-      grad.addColorStop(1, `rgba(0,0,0,0)`);
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(0, -1.5);
-      ctx.lineTo(-m.length, -6);
-      ctx.lineTo(-m.length, 6);
-      ctx.lineTo(0, 1.5);
-      ctx.closePath();
-      ctx.fill();
-
-      // bright head as a small circle
-      ctx.beginPath();
-      ctx.fillStyle = `hsla(${m.hue},${m.sat}%,85%,1)`;
-      ctx.arc(2,0, Math.max(2, Math.min(6, m.length*0.02)), 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // occasionally spawn new meteors (heavy)
-    if(Math.random() < 0.12) spawnMeteor();
-
-    // cull meteors that went away
-    for(let i = meteors.length-1; i>=0; i--){
-      const m = meteors[i];
-      if(m.x < -w*0.5 || m.x > w*1.5 || m.y > h*1.5) meteors.splice(i,1);
-    }
-
-    requestAnimationFrame(draw);
-  }
-
-  window.addEventListener('resize', init);
-  init();
-  requestAnimationFrame(draw);
 })();
