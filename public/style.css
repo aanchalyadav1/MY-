@@ -1,4 +1,6 @@
-/* style.css — dark neon + cute hologram */
+/* =========================================================
+      GLOBAL THEME — dark neon hologram + 3D stars
+========================================================= */
 :root{
   --bg:#050812;
   --panel:#071225;
@@ -9,97 +11,326 @@
   --glass: rgba(255,255,255,0.03);
 }
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%}
+
 body{
-  margin:0;
   font-family:Inter,system-ui,Arial,Helvetica,sans-serif;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(122,62,255,0.02), transparent 8%),
-              linear-gradient(180deg, rgba(2,6,23,1), rgba(6,10,18,1));
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(122,62,255,0.02), transparent 8%),
+    linear-gradient(180deg, rgba(2,6,23,1), rgba(6,10,18,1));
   color:#e6eef8;
   -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
   overflow-x:hidden;
 }
 
-/* stars canvas behind content */
+/* =========================================================
+      BACKGROUND STARS + METEORS LAYER
+========================================================= */
 .stars-canvas{
-  position:fixed; inset:0; z-index:0; pointer-events:none;
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
 }
 
-/* small card base */
-.card{
+/* =========================================================
+      CARDS
+========================================================= */
+.card,
+.cardItem{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
   border-radius:12px;
   padding:16px;
   border:1px solid rgba(255,255,255,0.03);
   box-shadow:0 12px 40px rgba(2,6,23,0.6);
   color:var(--muted);
+  transition:0.25s ease;
 }
 
-/* container stacking */
-.container{max-width:980px;margin:0 auto;padding:28px 18px;position:relative;z-index:3}
+.card:hover,
+.cardItem:hover{
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(125,211,252,0.06);
+}
 
-/* top-right menu */
-.top-right-menu{position:fixed;right:18px;top:14px;display:flex;gap:10px;z-index:6}
-.trm-item{color:var(--muted);text-decoration:none;padding:8px 10px;border-radius:10px;font-size:14px;backdrop-filter: blur(6px);background:transparent;border:1px solid rgba(255,255,255,0.03)}
-.trm-item:hover{color:var(--neon1);box-shadow:0 6px 30px rgba(125,211,252,0.06);transform:translateY(-2px);transition:.18s}
+/* =========================================================
+      CONTAINER
+========================================================= */
+.container{
+  max-width:980px;
+  margin:0 auto;
+  padding:28px 18px;
+  position:relative;
+  z-index:3;
+}
 
-/* floating nav (right) */
-.float-nav{position:fixed;right:16px;bottom:110px;display:flex;flex-direction:column;gap:10px;z-index:5}
-.float-btn{width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);display:grid;place-items:center;color:var(--neon1);cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 8px 24px rgba(2,6,23,0.6)}
-.float-btn:hover{transform:translateY(-6px);box-shadow:0 18px 50px rgba(125,211,252,0.06)}
+/* =========================================================
+      TOP RIGHT MENU
+========================================================= */
+.top-right-menu{
+  position:fixed;
+  right:18px;
+  top:14px;
+  display:flex;
+  gap:10px;
+  z-index:6;
+}
 
-/* hero */
-.hero{padding-top:48px;padding-bottom:48px;display:flex;align-items:center;min-height:68vh}
-.hero-inner{display:flex;gap:28px;align-items:center}
-.holo-wrap{width:320px;height:380px;position:relative;display:flex;align-items:center;justify-content:center}
-.holo-card{width:280px;height:340px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(2,6,23,0.05));box-shadow:0 20px 60px rgba(3,7,20,0.6);border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:22px}
-.avatar img{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.04);box-shadow:0 8px 30px rgba(125,211,252,0.06)}
-.meta h3{margin:12px 0 4px 0;font-size:20px;color:var(--neon2)}
-.meta p{margin:0;color:var(--muted);font-size:13px}
-.ring{position:absolute;border-radius:9999px;mix-blend-mode:screen;filter:blur(6px)}
-.r1{width:420px;height:420px;border:1px solid rgba(125,211,252,0.03);box-shadow:0 0 60px rgba(125,211,252,0.04)}
-.r2{width:360px;height:360px;border:1px dashed rgba(167,139,250,0.02);transform:rotate(18deg)}
+.trm-item{
+  color:var(--muted);
+  text-decoration:none;
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:14px;
+  backdrop-filter: blur(6px);
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.03);
+  transition:.2s;
+}
 
-/* holographic effects */
-.reflect{position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02));transform:skewX(-10deg);opacity:.6}
-.scanlines{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);background-size:100% 6px;mix-blend-mode:overlay;opacity:.06}
+.trm-item:hover{
+  color:var(--neon1);
+  transform:translateY(-2px);
+  box-shadow:0 6px 30px rgba(125,211,252,0.06);
+}
 
-/* hero text */
+/* =========================================================
+      FLOATING NAV
+========================================================= */
+.float-nav{
+  position:fixed;
+  right:16px;
+  bottom:110px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:5;
+}
+
+.float-btn{
+  width:46px;height:46px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);
+  display:grid;
+  place-items:center;
+  color:var(--neon1);
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+  box-shadow:0 8px 24px rgba(2,6,23,0.6);
+  transition:.35s ease;
+}
+
+.float-btn:hover{
+  transform:translateY(-6px) scale(1.05);
+  box-shadow:0 18px 50px rgba(125,211,252,0.15);
+}
+
+/* =========================================================
+      HERO SECTION
+========================================================= */
+.hero{
+  padding-top:48px;
+  padding-bottom:48px;
+  display:flex;
+  align-items:center;
+  min-height:70vh;
+}
+
+.hero-inner{
+  display:flex;
+  gap:28px;
+  align-items:center;
+  animation:fadeIn 1s ease both;
+}
+
+/* HOLOGRAM CARD */
+.holo-wrap{
+  width:320px;
+  height:380px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.holo-card{
+  width:280px;height:340px;
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(2,6,23,0.05));
+  box-shadow:0 20px 60px rgba(3,7,20,0.6);
+  border:1px solid rgba(255,255,255,0.04);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:22px;
+  animation:holoFloat 5s ease-in-out infinite;
+}
+
+/* floating hologram animation */
+@keyframes holoFloat{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+  100%{transform:translateY(0)}
+}
+
+.ring{
+  position:absolute;
+  border-radius:9999px;
+  mix-blend-mode:screen;
+  filter:blur(6px);
+}
+
+.r1{
+  width:420px;height:420px;
+  border:1px solid rgba(125,211,252,0.03);
+  box-shadow:0 0 60px rgba(125,211,252,0.04);
+}
+
+.r2{
+  width:360px;height:360px;
+  border:1px dashed rgba(167,139,250,0.03);
+  transform:rotate(18deg);
+}
+
+/* holographic reflections */
+.reflect{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:40%;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.02)
+  );
+  transform:skewX(-10deg);
+  opacity:.6;
+}
+
+.scanlines{
+  position:absolute;inset:0;
+  background-image:linear-gradient(
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px
+  );
+  background-size:100% 6px;
+  mix-blend-mode:overlay;
+  opacity:.06;
+}
+
+/* HERO TEXT */
 .hero-text{flex:1;min-width:320px}
 .hero-title{font-size:28px;color:var(--neon1);font-weight:700}
 .hero-sub{color:var(--neon2);margin-top:6px}
 .hero-intro{margin-top:12px;color:var(--muted);line-height:1.6}
+
+/* Social buttons */
 .social-row{display:flex;gap:12px;margin-top:14px}
-.social-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);text-decoration:none}
-.social-btn:hover{color:var(--neon1);box-shadow:0 12px 40px rgba(125,211,252,0.06)}
+.social-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:10px;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.03);
+  color:var(--muted);
+  text-decoration:none;
+  transition:.25s;
+}
 
-/* preview grid */
-.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
-.list .cardItem{padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.012),transparent);margin-top:8px;border:1px solid rgba(255,255,255,0.02)}
+.social-btn:hover{
+  color:var(--neon1);
+  box-shadow:0 12px 40px rgba(125,211,252,0.06);
+  transform:translateY(-2px);
+}
 
-/* login card (cute + neon) */
-.login-wrap{min-height:80vh;display:grid;place-items:center;z-index:3;position:relative}
-.login-card{width:360px;padding:22px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 60px rgba(2,6,23,0.6)}
-.btn{background:linear-gradient(90deg,var(--neon1),var(--neon2));border:none;padding:8px 10px;border-radius:10px;color:#02101a;font-weight:600;cursor:pointer}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;color:var(--muted)}
-input{background:#061020;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:10px;color:#dff;width:100%}
+/* =========================================================
+      PREVIEW GRID
+========================================================= */
+.preview-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-top:22px;
+}
 
-/* footer */
-.site-foot{text-align:center;padding:28px 0;color:rgba(255,255,255,0.24);position:relative;z-index:3}
+/* =========================================================
+      LOGIN + FORMS
+========================================================= */
+.login-wrap{
+  min-height:80vh;
+  display:grid;
+  place-items:center;
+  z-index:3;
+  position:relative;
+}
 
-/* tiny card item */
-.cardItem{padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.012),transparent);margin-top:8px;border:1px solid rgba(255,255,255,0.02)}
+.login-card{
+  width:360px;
+  padding:22px;
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.04);
+  box-shadow:0 20px 60px rgba(2,6,23,0.6);
+}
 
-/* animations */
-.fade-in{animation:fadeIn .8s ease both}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+input{
+  background:#061020;
+  border:1px solid rgba(255,255,255,0.04);
+  padding:10px;
+  border-radius:10px;
+  color:#dff;
+  width:100%;
+}
 
-/* responsive */
+.btn{
+  background:linear-gradient(90deg,var(--neon1),var(--neon2));
+  border:none;
+  padding:8px 10px;
+  border-radius:10px;
+  color:#02101a;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-ghost{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  padding:6px 8px;
+  border-radius:8px;
+  color:var(--muted);
+}
+
+/* =========================================================
+      FOOTER
+========================================================= */
+.site-foot{
+  text-align:center;
+  padding:28px 0;
+  color:rgba(255,255,255,0.24);
+  z-index:3;
+  position:relative;
+}
+
+/* =========================================================
+      ANIMATIONS GENERAL
+========================================================= */
+.fade-in{animation:fadeIn .8s ease both;}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+
+/* =========================================================
+      RESPONSIVE
+========================================================= */
 @media (max-width:880px){
   .hero-inner{flex-direction:column-reverse;gap:20px;padding-top:20px}
-  .holo-wrap{width:220px;height:260px}
+  .holo-wrap{width:240px;height:290px}
   .preview-grid{grid-template-columns:1fr}
   .float-nav{right:10px}
-          }
+}
