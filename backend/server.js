@@ -7,58 +7,80 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Use environment variables instead of serviceAccount.json
+// --------------------- FIREBASE INITIALIZATION ---------------------
+// Ensure FIREBASE_PRIVATE_KEY is set in Render with actual \n replaced by real newlines
 admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    privateKey: process.env.FIREBASE_PRIVATE_KEY
+      ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+      : undefined,
   }),
 });
 
 const db = admin.firestore();
 
-// --------------------- SAVE PROFILE DATA ---------------------
+// --------------------- ROUTES ---------------------
+
+// Save profile data
 app.post("/saveProfile", async (req, res) => {
-  await db.collection("profile").doc("main").set(req.body);
-  res.send({ status: "success" });
+  try {
+    await db.collection("profile").doc("main").set(req.body);
+    res.send({ status: "success" });
+  } catch (err) {
+    res.status(500).send({ status: "error", error: err.message });
+  }
 });
 
-// --------------------- SAVE CERTIFICATES ---------------------
+// Save certificates
 app.post("/saveCertificates", async (req, res) => {
-  await db.collection("certificates").doc("list").set(req.body);
-  res.send({ status: "success" });
+  try {
+    await db.collection("certificates").doc("list").set(req.body);
+    res.send({ status: "success" });
+  } catch (err) {
+    res.status(500).send({ status: "error", error: err.message });
+  }
 });
 
-// --------------------- SAVE INTERNSHIPS ---------------------
+// Save internships
 app.post("/saveInternships", async (req, res) => {
-  await db.collection("internships").doc("list").set(req.body);
-  res.send({ status: "success" });
+  try {
+    await db.collection("internships").doc("list").set(req.body);
+    res.send({ status: "success" });
+  } catch (err) {
+    res.status(500).send({ status: "error", error: err.message });
+  }
 });
 
-// --------------------- SAVE PROJECTS ---------------------
+// Save projects
 app.post("/saveProjects", async (req, res) => {
-  await db.collection("projects").doc("list").set(req.body);
-  res.send({ status: "success" });
+  try {
+    await db.collection("projects").doc("list").set(req.body);
+    res.send({ status: "success" });
+  } catch (err) {
+    res.status(500).send({ status: "error", error: err.message });
+  }
 });
 
-// --------------------- AUTO IMPORT GITHUB PROJECTS ---------------------
+// Auto import GitHub projects
 app.get("/fetchGithub/:username", async (req, res) => {
   try {
     const url = `https://api.github.com/users/${req.params.username}/repos`;
     const r = await axios.get(url);
     res.send(r.data);
   } catch (e) {
-    res.send({ error: e.message });
+    res.status(500).send({ error: e.message });
   }
 });
 
-// --------------------- LINKEDIN CERTIFICATE SCRAPER ---------------------
+// LinkedIn certificate scraper placeholder
 app.get("/fetchLinkedIn/:id", async (req, res) => {
   res.send({
     message: "Scraping LinkedIn requires an external server like Puppeteer.",
   });
 });
 
+// --------------------- START SERVER ---------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
