@@ -1,63 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Certificates — Aanchal</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
 </head>
 <body>
-  <canvas id="starsCanvas"></canvas>
-
-  <nav class="top-right-menu" aria-label="Primary">
-    <a href="index.html" class="trm-item">Home</a>
-    <a href="certificates.html" class="trm-item active">Certificates</a>
-    <a href="internships.html" class="trm-item">Internships</a>
-    <a href="projects.html" class="trm-item">Projects</a>
-    <a href="login.html" class="trm-item admin-link">Admin</a>
-  </nav>
-
-  <div class="float-nav">
-    <button class="float-btn" data-href="index.html" title="Home">🏠</button>
-  </div>
-
-  <main class="page fade-in">
-    <section class="section container">
-      <h2 class="section-title">Certificates</h2>
-      <div id="certCards" class="cards"><div class="card">Loading…</div></div>
-    </section>
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
+  <nav class="top-right-menu"><a href="index.html" class="trm-item">Home</a><a href="admin.html" class="trm-item admin-link">Admin</a></nav>
+  <main class="container" style="padding-top:48px">
+    <h1>Certificates</h1>
+    <div id="certList">Loading…</div>
   </main>
-
-  <nav class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="certificates.html" class="active">Certificates</a>
-    <a href="internships.html">Internships</a>
-    <a href="projects.html">Projects</a>
-  </nav>
-
-  <footer class="site-foot">© 2025 Aanchal</footer>
+  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="firebase.js" defer></script>
-  <script src="auth.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
   <script>
-    // load
-    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c])); }
-    async function loadCertificates(){
-      const el = document.getElementById('certCards');
+    const db = window.db || firebase.firestore();
+    function escapeHtml(s){ return s ? s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
+    async function load(){
+      const out = document.getElementById('certList');
       try{
-        const doc = await firebase.firestore().collection('certificates').doc('list').get();
+        const doc = await db.collection('certificates').doc('list').get();
         const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-        if(items.length===0){ el.innerHTML='<div class=\"card\">No certificates yet.</div>'; return; }
-        el.innerHTML = items.map(c=>`<div class=\"card\"><h4>${escapeHtml(c.title)}</h4><p>${escapeHtml(c.issuer||'')}</p></div>`).join('');
-      }catch(e){ console.error(e); el.innerHTML = '<div class=\"card\">Error loading</div>'; }
+        out.innerHTML = items.length ? '' : '<p style="opacity:.7">No certificates</p>';
+        items.forEach(c=>{
+          const d = document.createElement('div'); d.className='cardItem';
+          d.innerHTML = `<strong>${escapeHtml(c.title)}</strong><div style="color:var(--muted)">${escapeHtml(c.issuer||'')}</div>`;
+          if(c.fileUrl){ const a=document.createElement('a'); a.href=c.fileUrl; a.target='_blank'; a.textContent='View'; d.appendChild(a); }
+          out.appendChild(d);
+        });
+      }catch(e){ console.error(e); out.innerHTML='<p>Error</p>'; }
     }
-    window.addEventListener('load', loadCertificates);
-    // float nav
-    document.querySelectorAll('.float-btn').forEach(b=>b.addEventListener('click',()=>location.href=b.getAttribute('data-href')));
+    document.addEventListener('DOMContentLoaded', load);
   </script>
 </body>
-    </html>
-    
+</html>
