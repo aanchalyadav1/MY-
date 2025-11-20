@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Login — Aanchal</title>
+<link rel="stylesheet" href="style.css">
+</head><body class="login-body">
+<div class="login-wrap">
+  <div class="login-card" id="card">
+    <div class="holo-circle"></div>
+    <h2 class="login-title">Admin Sign In</h2>
+    <input id="username" class="login-input" placeholder="Username">
+    <input id="password" class="login-input" type="password" placeholder="Password">
+    <button id="loginBtn" class="primary-btn">Sign In</button>
+    <p id="loginMsg" class="login-msg"></p>
+  </div>
+</div>
+
+<script>
+document.getElementById('loginBtn').addEventListener('click', adminLogin);
+function adminLogin(){
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const ADMIN_USER = 'aanchal'; // change locally if desired
+  const ADMIN_PASS = 'admin123';
+  const msg = document.getElementById('loginMsg');
+  const card = document.getElementById('card');
+  if(u === ADMIN_USER && p === ADMIN_PASS){
+    localStorage.setItem('adminAuth','true');
+    msg.style.color = "#0ff"; msg.textContent = "Welcome — Redirecting…";
+    setTimeout(()=> location.href = 'admin.html', 500);
+  } else {
+    msg.style.color = "#ff7b7b"; msg.textContent = "Invalid credentials";
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+  }
+}
+</script>
+</body></html>
