@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Internships — Aanchal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
+</head>
+<body>
+  <canvas id="starsCanvas"></canvas>
+
+  <nav class="top-right-menu" aria-label="Primary">
+    <a href="index.html" class="trm-item">Home</a>
+    <a href="certificates.html" class="trm-item">Certificates</a>
+    <a href="internships.html" class="trm-item active">Internships</a>
+    <a href="projects.html" class="trm-item">Projects</a>
+    <a href="login.html" class="trm-item admin-link">Admin</a>
+  </nav>
+
+  <div class="float-nav">
+    <button class="float-btn" data-href="index.html" title="Home">🏠</button>
+  </div>
+
+  <main class="page fade-in">
+    <section class="section container">
+      <h2 class="section-title">Internships</h2>
+      <div id="internCards" class="cards"><div class="card">Loading…</div></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="certificates.html">Certificates</a>
+    <a href="internships.html" class="active">Internships</a>
+    <a href="projects.html">Projects</a>
+  </nav>
+
+  <footer class="site-foot">© 2025 Aanchal</footer>
+
+  <script src="stars.js" defer></script>
+  <script src="firebase.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script>
+    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c])); }
+    async function loadInternships(){
+      const el = document.getElementById('internCards');
+      try{
+        const doc = await firebase.firestore().collection('internships').doc('list').get();
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+        if(items.length===0){ el.innerHTML='<div class=\"card\">No internships yet.</div>'; return; }
+        el.innerHTML = items.map(i=>`<div class=\"card\"><h4>${escapeHtml(i.company)}</h4><p>${escapeHtml(i.role||'')}</p><small>${escapeHtml(i.duration||'')}</small></div>`).join('');
+      }catch(e){ console.error(e); el.innerHTML = '<div class=\"card\">Error loading</div>'; }
+    }
+    window.addEventListener('load', loadInternships);
+    document.querySelectorAll('.float-btn').forEach(b=>b.addEventListener('click',()=>location.href=b.getAttribute('data-href')));
+  </script>
+</body>
+</html>
