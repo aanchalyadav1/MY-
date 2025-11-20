@@ -1,4 +1,4 @@
-const API = "http://localhost:5000";
+const API = "https://my-junc.onrender.com";
 
 function saveCertificates() {
   const certData = document.getElementById('certData').value;
