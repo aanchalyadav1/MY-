@@ -7,7 +7,7 @@
   <meta name="description" content="Aanchal Yadav — AI, Cybersecurity, Web Developer" />
   <link rel="stylesheet" href="style.css">
 
-  <!-- Firebase -->
+  <!-- Firebase libs (defer so firebase.js initializes before auth/admin scripts) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
@@ -26,31 +26,33 @@
     <a href="login.html" class="trm-item admin-link">Admin</a>
   </nav>
 
-  <!-- FLOAT NAV -->
+  <!-- FLOAT NAV (only one) -->
   <div class="float-nav" role="navigation" aria-label="Quick nav">
-    <button class="float-btn" data-href="index.html">🏠</button>
-    <button class="float-btn" data-href="certificates.html">📜</button>
-    <button class="float-btn" data-href="internships.html">💼</button>
-    <button class="float-btn" data-href="projects.html">🧩</button>
+    <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">🏠</button>
+    <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">📜</button>
+    <button class="float-btn" data-href="internships.html" title="Internships" aria-label="Internships">💼</button>
+    <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">🧩</button>
   </div>
 
   <!-- MAIN -->
-  <main id="app" class="page fade-in">
+  <main id="app" class="page">
     <header class="hero container">
       <div class="hero-inner">
 
-        <div class="holo-wrap">
+        <!-- HOLOGRAM (animated card) -->
+        <div class="holo-wrap" id="holoWrap" aria-hidden="false">
           <div class="ring r1"></div>
           <div class="ring r2"></div>
 
-          <div class="holo-card" id="holoCard">
-            <div class="avatar">
-              <img src="https://i.ibb.co/89M7t9K/abstract-avatar.png" alt="abstract avatar" />
+          <div class="holo-card" id="holoCard" role="img" aria-label="Holographic card">
+            <div class="avatar" id="avatarWrap" aria-hidden="true">
+              <!-- Animated image: use your image URL or local file -->
+              <img id="avatarImg" src="https://i.ibb.co/89M7t9K/abstract-avatar.png" alt="abstract avatar" />
             </div>
 
             <div class="meta">
-              <h3>Aanchal Yadav</h3>
-              <p>3rd-year CSE • AI • Cybersecurity</p>
+              <h3 class="meta-name">Aanchal Yadav</h3>
+              <p class="meta-sub">3rd-year CSE • AI • Cybersecurity</p>
             </div>
 
             <div class="reflect"></div>
@@ -58,24 +60,36 @@
           </div>
         </div>
 
+        <!-- Intro + About (restored full text + subtle animated lines) -->
         <div class="hero-text">
-          <div class="hero-title">Hey there! I’m Aanchal Yadav</div>
+          <div class="hero-title">Hey there! I’m <span class="accent">Aanchal Yadav</span></div>
           <div class="hero-sub">AI • Cybersecurity • Web Developer</div>
 
           <div class="hero-intro">
-            <p>I’m a 3rd-year Computer Science Engineering student...</p>
+            <p class="reveal">I’m a 3rd-year Computer Science Engineering student at Sushila Devi Bansal College of Engineering, Indore — passionate about Artificial Intelligence, Cybersecurity, and everything tech!</p>
 
-            <p style="margin-top:12px">
-              Recently I’ve been doing multiple internships...
-            </p>
+            <p class="reveal" style="margin-top:12px">Over the last few months, I’ve been exploring the real-world side of what we study in class by doing multiple virtual internships, earning certifications, and working on projects that bring theory to life. Whether it's training an AI model, securing data with cryptography, or building interactive front-ends — I learn by doing.</p>
 
-            <div class="social-row">
-              <a href="https://github.com/aanchalyadav1" target="_blank" class="social-btn git">GitHub</a>
-              <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" class="social-btn ln">LinkedIn</a>
-            </div>
+            <p class="reveal" style="margin-top:12px">Some things I’ve enjoyed building:</p>
+
+            <ul class="reveal" style="margin-top:8px;line-height:1.7">
+              <li>🎨 Image generation & prompt engineering (Stable Diffusion)</li>
+              <li>🔒 Secure data hiding & steganography experiments</li>
+              <li>🧠 Movie recommendation systems (ML)</li>
+              <li>🌐 Personal interactive webpages with HTML/CSS/JS</li>
+              <li>💡 Generative AI projects and prototypes</li>
+            </ul>
+
+            <p class="reveal" style="margin-top:12px">I’ve completed certifications from IBM, Microsoft, Google, Cisco, HP LIFE, and more — each helping me level up.</p>
           </div>
-        </div>
 
+          <!-- Social icons (animated) -->
+          <div class="social-row reveal">
+            <a href="https://github.com/aanchalyadav1" target="_blank" class="social-btn git" aria-label="GitHub">GitHub</a>
+            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
+          </div>
+
+        </div>
       </div>
     </header>
 
@@ -89,17 +103,20 @@
         <div id="previewProjects" class="list"></div>
       </div>
     </section>
+
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
-  <!-- SCRIPTS -->
+  <!-- SCRIPTS (load in this order) -->
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script src="auth.js" defer></script>
   <script src="script.js" defer></script>
+  <script src="script-init.js" defer></script>
 
   <script>
+    // float nav links
     document.querySelectorAll('.float-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const href = btn.getAttribute('data-href');
@@ -107,6 +124,9 @@
       });
     });
   </script>
+
+</body>
+</html>  </script>
 
 </body>
 </html>  </html>  <script src="../scripts/firebase.js" defer></script>
