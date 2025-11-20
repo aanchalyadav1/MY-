@@ -1,0 +1,5 @@
+body { background: #000; color: #e6fbff; font-family: 'Poppins', sans-serif; padding: 20px; }
+.neon { color: #00eaff; text-shadow: 0 0 15px #00eaff; text-align:center; }
+.card { background: rgba(0,255,255,0.04); border: 1px solid rgba(0,255,255,0.12); padding: 18px; border-radius: 10px; max-width:1000px; margin: 20px auto; }
+button { background:#00eaff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;color:#000;margin-top:8px; }
+input, textarea { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color: #e6fbff; }

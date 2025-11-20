@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  background: black;
+}
+
+/* Galaxy */
+#galaxy {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #0b0b0b 0%, #000000 40%, #001018 100%);
+  animation: galaxy 20s infinite linear;
+  z-index: -1;
+  filter: blur(1px);
+}
+
+@keyframes galaxy {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.neon {
+  font-size: 3rem;
+  text-align: center;
+  margin-top: 120px;
+  color: #00eaff;
+  text-shadow: 0 0 20px #00eaff, 0 0 40px rgba(0,234,255,0.2);
+}
+
+.tagline {
+  text-align: center;
+  margin-top: 8px;
+  color: #9be9ff;
+  opacity: 0.9;
+}
+
+.menu {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.menu button {
+  padding: 12px 25px;
+  margin: 10px;
+  border: none;
+  background: #00eaff;
+  color: black;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #00eaff;
+  transition: transform 0.3s;
+}
+
+.menu button:hover {
+  transform: scale(1.05);
+}
+
+/* hologram cards */
+.card {
+  background: linear-gradient(135deg, rgba(0,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(0,255,255,0.18);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  margin: 20px auto;
+  width: calc(90% - 40px);
+  max-width: 900px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,255,255,0.06);
+  animation: float 3s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+section {
+  padding: 40px 0;
+}
