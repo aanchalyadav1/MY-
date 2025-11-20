@@ -1,5 +1,4 @@
-// firebase.js (v8)
-
+// scripts/firebase.js (v8)
 var firebaseConfig = {
   apiKey: "AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzw",
   authDomain: "portfolio-d3ea2.firebaseapp.com",
@@ -10,9 +9,9 @@ var firebaseConfig = {
   measurementId: "G-8WP1PB41LZ"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Export global
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 window.db = firebase.firestore();
 window.auth = firebase.auth();
+window.storage = firebase.storage();
