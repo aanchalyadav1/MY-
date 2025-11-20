@@ -1,44 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aanchal Yadav — Portfolio</title>
-
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase v8 (works with firebase.firestore()) -->
+  <!-- Firebase v8 (compatible with your code) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
-
 <body>
 
-  <!-- Animated Galaxy Background -->
-  <div id="galaxy"></div>
+  <!-- Galaxy Canvas -->
+  <canvas id="galaxyCanvas"></canvas>
 
-  <!-- Main Intro -->
-  <section class="home">
-    <h1 class="neon">AANCHAL YADAV</h1>
-    <p class="tagline">AI • Cybersecurity • Web Developer</p>
-
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="logo">AANCHAL</div>
     <div class="menu">
-      <button onclick="openSection('certificates')">Certificates</button>
-      <button onclick="openSection('internships')">Internships</button>
-      <button onclick="openSection('projects')">Projects</button>
+      <button onclick="scrollToSection('certificates')">Certificates</button>
+      <button onclick="scrollToSection('internships')">Internships</button>
+      <button onclick="scrollToSection('projects')">Projects</button>
+      <a class="admin-link" href="login.html">Admin</a>
     </div>
-  </section>
+  </nav>
 
-  <!-- Dynamic Sections -->
-  <section id="certificates"></section>
-  <section id="internships"></section>
-  <section id="projects"></section>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="profile-wrap">
+        <div class="profile-holo">
+          <img id="profilePic" src="assets/profile.jpg" alt="Aanchal">
+          <div class="holo-glow"></div>
+        </div>
+      </div>
 
-  <!-- Load Firebase config (must be inside /public folder) -->
+      <div class="hero-copy">
+        <h1 class="hero-title">Hi, I’m <span>Aanchal Yadav</span></h1>
+        <p class="hero-desc">AI Enthusiast • Cybersecurity Learner • Web Developer</p>
+
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://github.com/aanchalyadav1" target="_blank">GitHub</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/aanchal" target="_blank">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint" onclick="scrollToSection('certificates')">Scroll ↓</div>
+  </header>
+
+  <!-- SECTIONS -->
+  <main>
+    <section id="certificates" class="section">
+      <div class="section-inner" id="certificatesInner"></div>
+    </section>
+
+    <section id="internships" class="section">
+      <div class="section-inner" id="internshipsInner"></div>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="section-inner" id="projectsInner"></div>
+    </section>
+  </main>
+
+  <!-- Firebase config (frontend) -->
   <script src="firebase.js"></script>
 
-  <!-- Portfolio script -->
+  <!-- App logic -->
   <script src="script.js"></script>
+
+  <!-- Stars animation -->
+  <script src="stars.js"></script>
+
+  <!-- Hologram micro-interaction -->
+  <script>
+    (function(){
+      const profile = document.getElementById('profilePic');
+      if(!profile) return;
+      document.addEventListener('mousemove', e => {
+        const rect = profile.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        const dx = (e.clientX - cx)/25;
+        const dy = (e.clientY - cy)/25;
+        profile.style.transform = `translate(${dx}px, ${dy}px) rotateX(${dy}deg) rotateY(${dx}deg)`;
+      });
+      document.addEventListener('mouseleave', () => profile.style.transform = '');
+    })();
+  </script>
 
 </body>
 </html>
