@@ -1,18 +1,12 @@
-import admin from "firebase-admin";
-
-const serviceAccount = {
-  type: process.env.FIREBASE_TYPE,
-  project_id: process.env.FIREBASE_PROJECT_ID,
-  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  client_email: process.env.FIREBASE_CLIENT_EMAIL,
-  client_id: process.env.FIREBASE_CLIENT_ID,
-  auth_uri: process.env.FIREBASE_AUTH_URI,
-  token_uri: process.env.FIREBASE_TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
-  client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
+const firebaseConfig = {
+  apiKey: "AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzw",
+  authDomain: "portfolio-d3ea2.firebaseapp.com",
+  projectId: "portfolio-d3ea2",
+  storageBucket: "portfolio-d3ea2.firebasestorage.app",
+  messagingSenderId: "785515133038",
+  appId: "1:785515133038:web:7661d57e681edc08f18e7f",
+  measurementId: "G-8WP1PB41LZ"
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
