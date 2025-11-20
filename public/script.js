@@ -1,11 +1,10 @@
-// script.js — index page dynamic content
+// script.js — index page preview loader
 const db = window.db || firebase.firestore();
 
 function escapeHtml(str){ return str ? str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
 
 async function loadPreview(){
   try{
-    // certificates
     const cdoc = await db.collection('certificates').doc('list').get();
     const certs = cdoc.exists && Array.isArray(cdoc.data().items) ? cdoc.data().items : [];
     const pc = document.getElementById('previewCerts');
@@ -17,7 +16,6 @@ async function loadPreview(){
       pc.appendChild(d);
     });
 
-    // projects
     const pdoc = await db.collection('projects').doc('list').get();
     const projects = pdoc.exists && Array.isArray(pdoc.data().items) ? pdoc.data().items : [];
     const pp = document.getElementById('previewProjects');
@@ -32,5 +30,4 @@ async function loadPreview(){
   }catch(e){ console.error(e); }
 }
 
-// run
 document.addEventListener('DOMContentLoaded', loadPreview);
