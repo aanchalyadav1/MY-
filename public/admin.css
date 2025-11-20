@@ -1,8 +1,8 @@
-body{font-family:Inter, Poppins, system-ui, -apple-system,'Segoe UI',Roboto,Arial;background:#071021;color:#eafaff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-.login-wrap{width:100%;max-width:420px;padding:20px}
-.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:12px;border:1px solid rgba(0,255,255,0.04);box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+body{font-family:Inter, Poppins, system-ui, -apple-system,'Segoe UI',Roboto,Arial;background:#071021;color:#eafaff;display:flex;align-items:flex-start;justify-content:center;min-height:100vh;margin:0;padding:24px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:12px;border:1px solid rgba(0,255,255,0.04);box-shadow:0 20px 60px rgba(0,0,0,0.6);width:100%}
 h2{margin-bottom:6px}
-p.note{font-size:0.85rem;opacity:0.9}
+.note{font-size:0.85rem;opacity:0.9}
 .btn{padding:10px 14px;border-radius:10px;border:none;background:#00d8ff;color:#001;font-weight:700;cursor:pointer}
-.btn-ghost{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaffff;cursor:pointer}
-input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eafaff;margin-top:8px}
+.btn-ghost{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaffff;cursor:pointer}
+input{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eafaff;margin-top:8px}
+section h3{margin-top:14px}
