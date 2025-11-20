@@ -1,81 +1,36 @@
-// Smooth nav for top-right menu and bottom nav
-document.addEventListener('click', (e)=>{
-  if(e.target.tagName==='A' && e.target.hash){
-    const id = e.target.hash.replace('#','');
-    const el = document.getElementById(id);
-    if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth'}); }
-  }
-});
+// script.js — index page dynamic content
+const db = window.db || firebase.firestore();
 
-// floating nav click handling
-document.querySelectorAll('.float-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const href = btn.getAttribute('data-href') || btn.getAttribute('data-target');
-    if(!href) return;
-    if(href.endsWith('.html')) location.href = href;
-    else {
-      // map legacy data-target names
-      if(href==='certs' || href==='certificates') location.href='certificates.html';
-      else if(href==='intern') location.href='internships.html';
-      else if(href==='projects') location.href='projects.html';
-      else location.href = href;
-    }
-  });
-});
+function escapeHtml(str){ return str ? str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
 
-// hologram tilt
-const holo = document.getElementById('holoCard');
-if(holo){
-  window.addEventListener('mousemove',(e)=>{
-    const rect = holo.getBoundingClientRect();
-    const cx = rect.left + rect.width/2; const cy = rect.top + rect.height/2;
-    const dx = (e.clientX - cx)/20; const dy = (e.clientY - cy)/20;
-    holo.style.transform = `translateZ(0) rotateX(${dy}deg) rotateY(${dx}deg)`;
-  });
-  window.addEventListener('mouseleave', ()=>{ holo.style.transform=''; });
-}
-
-// Firestore loaders (if firebase present)
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c])); }
-
-async function loadCertificates(){
-  if(!window.firebase) return;
-  const el = document.getElementById('certCards');
-  if(!el) return;
+async function loadPreview(){
   try{
-    const doc = await firebase.firestore().collection('certificates').doc('list').get();
-    const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-    if(items.length===0){ el.innerHTML = '<div class="card">No certificates yet.</div>'; return; }
-    el.innerHTML = items.map(c=>`<div class="card"><h4>${escapeHtml(c.title)}</h4><p>${escapeHtml(c.issuer||'')}</p></div>`).join('');
-  }catch(e){ console.error(e); el.innerHTML = '<div class="card">Error loading</div>'; }
+    // certificates
+    const cdoc = await db.collection('certificates').doc('list').get();
+    const certs = cdoc.exists && Array.isArray(cdoc.data().items) ? cdoc.data().items : [];
+    const pc = document.getElementById('previewCerts');
+    pc.innerHTML = certs.length ? '' : '<p style="opacity:.7">No certificates yet</p>';
+    certs.slice(-3).reverse().forEach(c=>{
+      const d = document.createElement('div'); d.className='cardItem';
+      d.innerHTML = `<strong>${escapeHtml(c.title)}</strong><div style="color:var(--muted)">${escapeHtml(c.issuer||'')}</div>`;
+      if(c.fileUrl){ const a=document.createElement('a'); a.href=c.fileUrl; a.target='_blank'; a.textContent='View'; d.appendChild(a); }
+      pc.appendChild(d);
+    });
+
+    // projects
+    const pdoc = await db.collection('projects').doc('list').get();
+    const projects = pdoc.exists && Array.isArray(pdoc.data().items) ? pdoc.data().items : [];
+    const pp = document.getElementById('previewProjects');
+    pp.innerHTML = projects.length ? '' : '<p style="opacity:.7">No projects yet</p>';
+    projects.slice(-3).reverse().forEach(p=>{
+      const d = document.createElement('div'); d.className='cardItem';
+      d.innerHTML = `<strong>${escapeHtml(p.name)}</strong><div style="color:var(--muted)">${escapeHtml(p.desc||'')}</div>`;
+      if(p.url){ const a=document.createElement('a'); a.href=p.url; a.target='_blank'; a.textContent='Open'; d.appendChild(a); }
+      pp.appendChild(d);
+    });
+
+  }catch(e){ console.error(e); }
 }
 
-async function loadInternships(){
-  if(!window.firebase) return;
-  const el = document.getElementById('internCards');
-  if(!el) return;
-  try{
-    const doc = await firebase.firestore().collection('internships').doc('list').get();
-    const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-    if(items.length===0){ el.innerHTML = '<div class="card">No internships yet.</div>'; return; }
-    el.innerHTML = items.map(i=>`<div class="card"><h4>${escapeHtml(i.company)}</h4><p>${escapeHtml(i.role||'')}</p><small>${escapeHtml(i.duration||'')}</small></div>`).join('');
-  }catch(e){ console.error(e); el.innerHTML = '<div class="card">Error loading</div>'; }
-}
-
-async function loadProjects(){
-  if(!window.firebase) return;
-  const el = document.getElementById('projectsCards');
-  if(!el) return;
-  try{
-    const doc = await firebase.firestore().collection('projects').doc('list').get();
-    const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-    if(items.length===0){ el.innerHTML = '<div class="card">No projects yet.</div>'; return; }
-    el.innerHTML = items.map(p=>`<div class="card"><h4>${escapeHtml(p.name)}</h4><p>${escapeHtml(p.desc||'')}</p><p style="margin-top:8px"><a href="${encodeURI(p.url||'#')}" target="_blank">View</a></p></div>`).join('');
-  }catch(e){ console.error(e); el.innerHTML = '<div class="card">Error loading</div>'; }
-}
-
-// init loads for content pages
-window.addEventListener('load', ()=>{
-  // run loads with delay if firebase hasn't initialized yet
-  setTimeout(()=>{ loadCertificates(); loadInternships(); loadProjects(); }, 250);
-});
+// run
+document.addEventListener('DOMContentLoaded', loadPreview);
