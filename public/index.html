@@ -6,15 +6,17 @@
   <title>Aanchal Yadav — Home</title>
   <meta name="description" content="Aanchal Yadav — AI, Cybersecurity, Web Developer" />
   <link rel="stylesheet" href="style.css">
+
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js" defer></script>
 </head>
-<body>
 
+<body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
+  <!-- TOP NAV -->
   <nav class="top-right-menu" aria-label="Primary">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
@@ -23,23 +25,25 @@
     <a href="login.html" class="trm-item admin-link">Admin</a>
   </nav>
 
+  <!-- FLOAT NAV (only one) -->
   <div class="float-nav" role="navigation" aria-label="Quick nav">
-    <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">🏠</button>
-    <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">📜</button>
-    <button class="float-btn" data-href="internships.html" title="Internships" aria-label="Internships">💼</button>
-    <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">🧩</button>
+    <button class="float-btn" data-href="index.html" title="Home">🏠</button>
+    <button class="float-btn" data-href="certificates.html" title="Certificates">📜</button>
+    <button class="float-btn" data-href="internships.html" title="Internships">💼</button>
+    <button class="float-btn" data-href="projects.html" title="Projects">🧩</button>
   </div>
 
+  <!-- MAIN -->
   <main id="app" class="page fade-in">
     <header class="hero container">
       <div class="hero-inner">
 
-        <div class="holo-wrap" aria-hidden="false">
+        <div class="holo-wrap">
           <div class="ring r1"></div>
           <div class="ring r2"></div>
 
           <div class="holo-card" id="holoCard">
-            <div class="avatar" aria-hidden="true">
+            <div class="avatar">
               <img src="https://i.ibb.co/89M7t9K/abstract-avatar.png" alt="abstract avatar" />
             </div>
 
@@ -58,13 +62,15 @@
           <div class="hero-sub">AI • Cybersecurity • Web Developer</div>
 
           <div class="hero-intro">
-            <p>I’m a 3rd-year Computer Science Engineering student at Sushila Devi Bansal College of Engineering, Indore — passionate about Artificial Intelligence, Cybersecurity, and everything tech!</p>
+            <p>I’m a 3rd-year Computer Science Engineering student from Sushila Devi Bansal College of Engineering, Indore — passionate about Artificial Intelligence, Cybersecurity, and everything tech!</p>
 
-            <p style="margin-top:12px">Over the last few months, I’ve been exploring the real-world side of what we study in class by doing multiple virtual internships, earning certifications, and working on projects that bring theory to life.</p>
+            <p style="margin-top:12px">
+              Recently I’ve been doing multiple internships, earning certifications, and building projects to turn theory into real-world skills.
+            </p>
 
             <div class="social-row">
-              <a href="https://github.com/aanchalyadav1" target="_blank" rel="noopener" class="social-btn git" aria-label="GitHub">GitHub</a>
-              <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" rel="noopener" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
+              <a href="https://github.com/aanchalyadav1" target="_blank" class="social-btn git">GitHub</a>
+              <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" class="social-btn ln">LinkedIn</a>
             </div>
           </div>
         </div>
@@ -81,32 +87,26 @@
         <div id="previewProjects" class="list"></div>
       </div>
     </section>
-
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
+  <!-- SCRIPTS -->
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script src="script.js" defer></script>
+
   <script>
-    document.querySelectorAll('.float-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=> { const href = btn.getAttribute('data-href'); if(href) location.href = href; });
+    document.querySelectorAll('.float-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const href = btn.getAttribute('data-href');
+        if (href) location.href = href;
+      });
     });
   </script>
+
 </body>
-</html>  <nav class="bottom-nav" aria-label="Bottom">
-    <a href="index.html" class="bn">Home</a>
-    <a href="certificates.html" class="bn">Certificates</a>
-    <a href="internships.html" class="bn">Internships</a>
-    <a href="projects.html" class="bn">Projects</a>
-  </nav>
-
-  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
-
-  <!-- local scripts -->
-  <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  </html>  <script src="../scripts/firebase.js" defer></script>
   <script src="auth.js" defer></script>
   <script src="script.js" defer></script>
 
