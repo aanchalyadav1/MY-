@@ -11,15 +11,20 @@ var firebaseConfig = {
   measurementId: "G-8WP1PB41LZ"
 };
 
-if(!window.firebaseApp){
-  firebase.initializeApp(firebaseConfig);
-  window.firebaseApp = firebase.app();
-  window.db = firebase.firestore();
-  window.auth = firebase.auth();
-  window.storage = firebase.storage();
-  console.log('Firebase initialized');
-} else {
-  window.db = firebase.firestore();
-  window.auth = firebase.auth();
-  window.storage = firebase.storage();
-}
+
+(function(){
+  if(!window.firebase || !window.AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzwG){
+    console.error('Firebase SDK not loaded or config missing');
+    return;
+  }
+  try{
+    const app = firebase.initializeApp(window.AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzw);
+    window.firebaseApp = app;
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
+    window.storage = firebase.storage();
+    console.log('Firebase initialized (compat).');
+  }catch(e){
+    console.error('Firebase init error', e);
+  }
+})();
