@@ -1,5 +1,10 @@
 // auth.js - simple login & signup redirect logic (v8 style)
-(function(){
+(async function(){
+  try{
+    await (window._firebaseReady || Promise.resolve(null));
+  }catch(e){
+    console.warn('Firebase not ready for auth:', e);
+  }
   const auth = window.auth || (window.firebase && firebase.auth && firebase.auth());
 
   const loginForm = document.getElementById('loginForm');
@@ -8,6 +13,10 @@
       e.preventDefault();
       const email = loginForm.querySelector('input[name="email"]').value.trim();
       const pass = loginForm.querySelector('input[name="password"]').value;
+      if(!auth){
+        window.toast && window.toast('Authentication service not available', {type:'error'});
+        return;
+      }
       try{
         await auth.signInWithEmailAndPassword(email, pass);
         // redirect to admin: admin.js will check admin role and allow access
@@ -22,6 +31,7 @@
   // Optional: signout helper
   window.logout = async function(){
     try{
+      if(!auth) return window.location.href = 'login.html';
       await auth.signOut();
       window.location.href = 'login.html';
     }catch(e){ console.error(e); }
