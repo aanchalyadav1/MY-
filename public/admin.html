@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — Aanchal</title>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    /* admin-specific */
-    .admin-wrap{max-width:980px;margin:28px auto;padding:18px;z-index:5;position:relative}
-    .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    .admin-panel{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04)}
-    .list-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-top:8px}
-    .preview-img{height:56px;width:88px;object-fit:cover;border-radius:6px}
-    .file-input{display:flex;gap:8px;align-items:center}
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script src="firebase.js" defer></script>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
+
   <nav class="top-right-menu">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
@@ -25,62 +17,224 @@
     <button id="signOutBtn" class="trm-item btn-ghost">Sign out</button>
   </nav>
 
-  <main class="admin-wrap">
+  <main class="container admin-wrap" style="padding-top:80px">
     <h2>Admin Dashboard</h2>
     <p style="color:var(--muted)">Manage Certificates, Internships & Projects</p>
 
-    <div class="admin-grid">
-      <!-- Certificates panel -->
-      <div class="admin-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px">
+      <div class="card">
         <h4>Certificates</h4>
         <div id="certList"></div>
-
-        <hr style="margin:10px 0"/>
-
-        <input id="certTitle" placeholder="Title" />
-        <input id="certIssuer" placeholder="Issuer" />
-        <div class="file-input" style="margin-top:8px">
-          <input id="certImage" type="file" accept="image/*"/>
+        <hr style="margin:10px 0">
+        <input id="certTitle" placeholder="Title" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+        <input id="certIssuer" placeholder="Issuer" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <input id="certImage" type="file" accept="image/*">
           <div id="certPreview" style="width:88px;height:56px;border-radius:6px;background:rgba(255,255,255,0.02);display:grid;place-items:center;color:var(--muted)">Preview</div>
         </div>
-        <input id="certLink" placeholder="Certificate URL (optional)" style="margin-top:8px"/>
+        <input id="certLink" placeholder="Certificate URL (optional)" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
         <button id="addCert" class="btn" style="margin-top:10px">Add Certificate</button>
       </div>
 
-      <!-- Internships & Projects panel -->
       <div>
-        <div class="admin-panel" style="margin-bottom:14px">
+        <div class="card" style="margin-bottom:14px">
           <h4>Internships</h4>
           <div id="internList"></div>
-          <hr style="margin:10px 0"/>
-          <input id="internCompany" placeholder="Company" />
-          <input id="internRole" placeholder="Role" />
-          <input id="internDuration" placeholder="Duration" />
+          <hr style="margin:10px 0">
+          <input id="internCompany" placeholder="Company" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+          <input id="internRole" placeholder="Role" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+          <input id="internDuration" placeholder="Duration" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
           <button id="addIntern" class="btn" style="margin-top:10px">Add Internship</button>
         </div>
 
-        <div class="admin-panel">
+        <div class="card">
           <h4>Projects</h4>
           <div id="projectList"></div>
-          <hr style="margin:10px 0"/>
-          <input id="projName" placeholder="Name" />
-          <input id="projDesc" placeholder="Description" />
-          <input id="projUrl" placeholder="Project URL (optional)" />
-          <div class="file-input" style="margin-top:8px">
-            <input id="projImage" type="file" accept="image/*"/>
+          <hr style="margin:10px 0">
+          <input id="projName" placeholder="Name" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+          <input id="projDesc" placeholder="Description" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+          <input id="projUrl" placeholder="Project URL (optional)" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+            <input id="projImage" type="file" accept="image/*">
             <div id="projPreview" style="width:88px;height:56px;border-radius:6px;background:rgba(255,255,255,0.02);display:grid;place-items:center;color:var(--muted)">Preview</div>
           </div>
           <button id="addProj" class="btn" style="margin-top:10px">Add Project</button>
         </div>
       </div>
     </div>
-
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
-  <script src="admin.js" defer></script>
+  <script src="avatar.js" defer></script>
+  <script src="script.js" defer></script>
+  <script>
+    // admin logic (simple) — expects firebase.js to be loaded
+    (function(){
+      const authRef = window.auth || firebase.auth();
+      const dbRef = window.db || firebase.firestore();
+      const storage = window.storage || firebase.storage();
+
+      const signOutBtn = document.getElementById('signOutBtn');
+      signOutBtn && signOutBtn.addEventListener('click', ()=> authRef.signOut().then(()=> location.href='login.html'));
+
+      // UI
+      const certList = document.getElementById('certList');
+      const internList = document.getElementById('internList');
+      const projectList = document.getElementById('projectList');
+
+      const certTitle = document.getElementById('certTitle');
+      const certIssuer = document.getElementById('certIssuer');
+      const certImage = document.getElementById('certImage');
+      const certPreview = document.getElementById('certPreview');
+      const certLink = document.getElementById('certLink');
+      const addCert = document.getElementById('addCert');
+
+      const internCompany = document.getElementById('internCompany');
+      const internRole = document.getElementById('internRole');
+      const internDuration = document.getElementById('internDuration');
+      const addIntern = document.getElementById('addIntern');
+
+      const projName = document.getElementById('projName');
+      const projDesc = document.getElementById('projDesc');
+      const projUrl = document.getElementById('projUrl');
+      const projImage = document.getElementById('projImage');
+      const projPreview = document.getElementById('projPreview');
+      const addProj = document.getElementById('addProj');
+
+      function dataUrlPreview(file, container){
+        if(!file){ container.innerHTML = 'Preview'; return; }
+        const r = new FileReader(); r.onload = (e)=> container.innerHTML = `<img src="${e.target.result}" style="height:56px;width:88px;border-radius:6px;object-fit:cover">`; r.readAsDataURL(file);
+      }
+      certImage && certImage.addEventListener('change', (e)=> dataUrlPreview(e.target.files[0], certPreview));
+      projImage && projImage.addEventListener('change', (e)=> dataUrlPreview(e.target.files[0], projPreview));
+
+      async function isAdminEmail(email){
+        try{
+          const doc = await dbRef.collection('admin').doc('list').get();
+          const arr = doc.exists && Array.isArray(doc.data().emails) ? doc.data().emails : [];
+          return arr.includes(email);
+        }catch(e){ console.warn(e); return false; }
+      }
+
+      authRef.onAuthStateChanged(async user=>{
+        if(!user){ location.href='login.html'; return; }
+        const ok = await isAdminEmail(user.email);
+        if(!ok){ alert('Not authorized'); await authRef.signOut(); location.href='login.html'; return; }
+        loadAll();
+      });
+
+      async function loadAll(){
+        renderCertificates(); renderInternships(); renderProjects();
+      }
+
+      async function renderCertificates(){
+        try{
+          const doc = await dbRef.collection('certificates').doc('list').get();
+          const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+          certList.innerHTML = items.length ? '' : '<p style="opacity:.8">No certificates</p>';
+          items.forEach((c, idx)=>{
+            const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.marginTop='8px';
+            row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">${c.image?`<img src="${c.image}" style="height:48px;width:72px;object-fit:cover;border-radius:6px">`:''}<div><strong>${c.title}</strong><div style="color:var(--muted);font-size:13px">${c.issuer||''}</div></div></div>`;
+            const del = document.createElement('button'); del.className='btn-ghost'; del.textContent='Delete'; del.addEventListener('click', ()=> deleteCertificate(idx));
+            row.appendChild(del); certList.appendChild(row);
+          });
+        }catch(e){ console.error(e); certList.innerHTML = '<p>Error</p>'; }
+      }
+      async function renderInternships(){
+        try{
+          const doc = await dbRef.collection('internships').doc('list').get();
+          const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+          internList.innerHTML = items.length ? '' : '<p style="opacity:.8">No internships</p>';
+          items.forEach((it, idx)=>{
+            const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.marginTop='8px';
+            row.innerHTML = `<div><strong>${it.company}</strong><div style="color:var(--muted);font-size:13px">${it.role||''} • ${it.duration||''}</div></div>`;
+            const del = document.createElement('button'); del.className='btn-ghost'; del.textContent='Delete'; del.addEventListener('click', ()=> deleteIntern(idx));
+            row.appendChild(del); internList.appendChild(row);
+          });
+        }catch(e){ console.error(e); internList.innerHTML = '<p>Error</p>'; }
+      }
+      async function renderProjects(){
+        try{
+          const doc = await dbRef.collection('projects').doc('list').get();
+          const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+          projectList.innerHTML = items.length ? '' : '<p style="opacity:.8">No projects</p>';
+          items.forEach((p, idx)=>{
+            const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.marginTop='8px';
+            row.innerHTML = `<div style="display:flex;align-items:center;gap:8px">${p.image?`<img src="${p.image}" style="height:48px;width:72px;object-fit:cover;border-radius:6px">`:''}<div><strong>${p.name}</strong><div style="color:var(--muted);font-size:13px">${p.desc||''}</div></div></div>`;
+            const del = document.createElement('button'); del.className='btn-ghost'; del.textContent='Delete'; del.addEventListener('click', ()=> deleteProject(idx));
+            row.appendChild(del); projectList.appendChild(row);
+          });
+        }catch(e){ console.error(e); projectList.innerHTML = '<p>Error</p>'; }
+      }
+
+      // upload helper (firebase storage)
+      async function uploadFile(file, prefix){
+        if(!file) return null;
+        const name = Date.now() + '_' + file.name.replace(/\s+/g,'_');
+        const ref = storage.ref().child(`${prefix}/${name}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL(); return url;
+      }
+
+      document.getElementById('addCert').addEventListener('click', async ()=>{
+        const title = certTitle.value.trim(); if(!title){ alert('Title required'); return; }
+        addCert.disabled=true;
+        try{
+          const file = certImage.files[0]; const url = file? await uploadFile(file,'certificates'):null;
+          const ref = dbRef.collection('certificates').doc('list');
+          await dbRef.runTransaction(async tx => {
+            const d = await tx.get(ref);
+            const items = d.exists && Array.isArray(d.data().items)? d.data().items.slice(): [];
+            items.push({ title, issuer: certIssuer.value.trim(), image: url, link: certLink.value.trim()||null, addedAt: Date.now() });
+            tx.set(ref, { items }, { merge:true });
+          });
+          certTitle.value=''; certIssuer.value=''; certImage.value=''; certPreview.innerHTML='Preview'; certLink.value='';
+          await renderCertificates();
+        }catch(e){ console.error(e); alert('Error'); }
+        addCert.disabled=false;
+      });
+
+      document.getElementById('addIntern').addEventListener('click', async ()=>{
+        const company = internCompany.value.trim(); if(!company){ alert('Company required'); return; }
+        addIntern.disabled=true;
+        try{
+          const ref = dbRef.collection('internships').doc('list');
+          await dbRef.runTransaction(async tx=>{
+            const d = await tx.get(ref);
+            const items = d.exists && Array.isArray(d.data().items) ? d.data().items.slice() : [];
+            items.push({ company, role: internRole.value.trim(), duration: internDuration.value.trim(), addedAt: Date.now() });
+            tx.set(ref,{items},{merge:true});
+          });
+          internCompany.value=''; internRole.value=''; internDuration.value='';
+          await renderInternships();
+        }catch(e){ console.error(e); alert('Error'); }
+        addIntern.disabled=false;
+      });
+
+      document.getElementById('addProj').addEventListener('click', async ()=>{
+        const name = projName.value.trim(); if(!name){ alert('Name required'); return; }
+        addProj.disabled=true;
+        try{
+          const file = projImage.files[0]; const url = file? await uploadFile(file,'projects'):null;
+          const ref = dbRef.collection('projects').doc('list');
+          await dbRef.runTransaction(async tx=>{
+            const d = await tx.get(ref); const items = d.exists && Array.isArray(d.data().items) ? d.data().items.slice() : [];
+            items.push({ name, desc: projDesc.value.trim(), url: projUrl.value.trim()||null, image: url||null, addedAt: Date.now() });
+            tx.set(ref,{items},{merge:true});
+          });
+          projName.value=''; projDesc.value=''; projUrl.value=''; projImage.value=''; projPreview.innerHTML='Preview';
+          await renderProjects();
+        }catch(e){ console.error(e); alert('Error'); }
+        addProj.disabled=false;
+      });
+
+      async function deleteCertificate(i){ if(!confirm('Delete?')) return; const ref = dbRef.collection('certificates').doc('list'); await dbRef.runTransaction(async tx=>{ const d = await tx.get(ref); const items = d.exists && Array.isArray(d.data().items) ? d.data().items.slice() : []; items.splice(i,1); tx.set(ref,{items}); }); renderCertificates(); }
+      async function deleteIntern(i){ if(!confirm('Delete?')) return; const ref = dbRef.collection('internships').doc('list'); await dbRef.runTransaction(async tx=>{ const d = await tx.get(ref); const items = d.exists && Array.isArray(d.data().items) ? d.data().items.slice() : []; items.splice(i,1); tx.set(ref,{items}); }); renderInternships(); }
+      async function deleteProject(i){ if(!confirm('Delete?')) return; const ref = dbRef.collection('projects').doc('list'); await dbRef.runTransaction(async tx=>{ const d = await tx.get(ref); const items = d.exists && Array.isArray(d.data().items) ? d.data().items.slice() : []; items.splice(i,1); tx.set(ref,{items}); }); renderProjects(); }
+
+    })();
+  </script>
 </body>
 </html>
