@@ -1,58 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Login — Aanchal</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .login-wrap{min-height:85vh;display:grid;place-items:center}
-    .login-card{width:360px;padding:20px;border-radius:12px}
-    .oauth-btn{width:100%;padding:10px;border-radius:10px;border:none;cursor:pointer;margin-top:8px}
-  </style>
+  <script src="firebase.js" defer></script>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
-  <main class="login-wrap">
-    <div class="login-card card">
-      <h3 style="margin:0 0 8px 0">Admin Sign in</h3>
-      <div style="color:var(--muted);margin-bottom:10px">Sign in with Google or email</div>
+  <main style="min-height:80vh;display:grid;place-items:center">
+    <div class="card" style="width:380px;padding:22px;border-radius:12px">
+      <h3 style="margin:0 0 8px 0">Admin sign in</h3>
+      <div style="color:var(--muted);margin-bottom:10px">Sign in with Google or email/password</div>
 
-      <button id="googleBtn" class="oauth-btn" style="background:linear-gradient(90deg,#fff 0%, #e8f9ff 100%);">Sign in with Google</button>
+      <button id="googleBtn" class="btn" style="width:100%;margin-bottom:10px">Sign in with Google</button>
 
-      <hr style="margin:12px 0"/>
-
-      <input id="email" type="email" placeholder="Email" style="margin-bottom:8px"/>
-      <input id="password" type="password" placeholder="Password" style="margin-bottom:8px"/>
-      <button id="emailSign" class="btn">Sign in with Email</button>
-
-      <p style="opacity:.8;margin-top:10px;font-size:13px">Only admin emails in Firestore (admin/list) can access admin dashboard.</p>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="email" placeholder="Email" style="flex:1;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="password" placeholder="Password" type="password" style="flex:1;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
+      </div>
+      <button id="emailSign" class="btn" style="width:100%;margin-top:10px">Sign in / Create</button>
+      <p style="opacity:.7;margin-top:10px;font-size:13px">Only admin emails in Firestore (admin/list) will get access to admin panel.</p>
     </div>
   </main>
 
   <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  <script src="avatar.js" defer></script>
   <script>
-    // firebase must be initialized in ../scripts/firebase.js and window.auth available
     document.addEventListener('DOMContentLoaded', ()=> {
       const googleBtn = document.getElementById('googleBtn');
       const emailBtn = document.getElementById('emailSign');
-      googleBtn.addEventListener('click', ()=> {
+
+      googleBtn.addEventListener('click', ()=>{
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).then(()=>{ window.location='admin.html' }).catch(e=>alert(e.message));
+        auth.signInWithPopup(provider).then(()=> window.location='admin.html').catch(e=> alert(e.message));
       });
+
       emailBtn.addEventListener('click', async ()=>{
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value.trim();
         const pw = document.getElementById('password').value;
+        if(!email || !pw){ alert('Enter email and password'); return; }
         try{
           await auth.signInWithEmailAndPassword(email,pw);
           window.location='admin.html';
         }catch(e){
-          if(e.code==='auth/user-not-found'){
-            // try create
-            try{ await auth.createUserWithEmailAndPassword(email,pw); window.location='admin.html'; }
-            catch(err){ alert(err.message); }
+          if(e.code === 'auth/user-not-found'){
+            try{ await auth.createUserWithEmailAndPassword(email,pw); window.location='admin.html'; } catch(err){ alert(err.message); }
           } else alert(e.message);
         }
       });
