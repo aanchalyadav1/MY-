@@ -1,42 +1,77 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Certificates — Aanchal</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Certificates — Aanchal Yadav</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
+  <style>
+    /* small helper for initials avatar */
+    .avatar-initials{
+      width:88px;height:88px;border-radius:50%;display:grid;place-items:center;
+      background:linear-gradient(90deg,var(--gold),var(--neon1));
+      color:#02101a;font-weight:700;font-size:28px;letter-spacing:1px;
+      box-shadow:0 8px 30px rgba(125,211,252,0.06);
+    }
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    @media (max-width:880px){ .cards{grid-template-columns:1fr} }
+    .cert-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
+    .cert-thumb{height:88px;width:100%;object-fit:cover;border-radius:8px;margin-bottom:8px}
+  </style>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <nav class="top-right-menu"><a href="index.html" class="trm-item">Home</a><a href="admin.html" class="trm-item admin-link">Admin</a></nav>
+  <nav class="top-right-menu">
+    <a href="index.html" class="trm-item">Home</a>
+    <a href="certificates.html" class="trm-item">Certificates</a>
+    <a href="internships.html" class="trm-item">Internships</a>
+    <a href="projects.html" class="trm-item">Projects</a>
+    <a href="login.html" class="trm-item">Admin</a>
+  </nav>
 
-  <main class="container" style="padding-top:48px">
-    <h1 style="color:var(--neon1)">Certificates</h1>
-    <div id="certList">Loading…</div>
+  <main class="container" style="padding-top:80px;">
+    <header style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <div class="avatar-initials">AY</div>
+      <div>
+        <h2 style="margin:0">Certificates</h2>
+        <div style="color:var(--muted);margin-top:4px">Verified and earned certificates</div>
+      </div>
+    </header>
+
+    <section id="certGrid" class="cards">
+      <!-- cards injected by JS -->
+    </section>
   </main>
+
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script>
-    const db = window.db || firebase.firestore();
-    function escapeHtml(s){ return s ? s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
-    async function load(){
-      const out = document.getElementById('certList');
+    // load certificates and render responsive grid/list
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      const box = document.getElementById('certGrid');
+      box.innerHTML = '<p style="opacity:.6">Loading…</p>';
       try{
         const doc = await db.collection('certificates').doc('list').get();
         const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-        out.innerHTML = items.length ? '' : '<p style="opacity:.7">No certificates</p>';
-        items.forEach(c=>{
-          const d = document.createElement('div'); d.className='cardItem';
-          d.innerHTML = `<strong>${escapeHtml(c.title)}</strong><div style="color:var(--muted)">${escapeHtml(c.issuer||'')}</div>`;
-          if(c.fileUrl){ const a=document.createElement('a'); a.href=c.fileUrl; a.target='_blank'; a.textContent='View'; d.appendChild(a); }
-          out.appendChild(d);
+        if(!items.length){ box.innerHTML = '<p style="opacity:.7">No certificates yet.</p>'; return; }
+        box.innerHTML = '';
+        items.forEach(it=>{
+          const el = document.createElement('div'); el.className='cert-card cardItem';
+          el.innerHTML = `
+            ${it.image ? `<img src="${it.image}" class="cert-thumb" alt="${it.title}">` : ''}
+            <strong>${escapeHtml(it.title)}</strong>
+            <div style="color:var(--muted);font-size:13px;margin-top:6px">${escapeHtml(it.issuer||'')}</div>
+            ${it.link ? `<div style="margin-top:8px"><a href="${it.link}" target="_blank" class="btn-ghost">View certificate</a></div>` : ''}
+          `;
+          box.appendChild(el);
         });
-      }catch(e){ console.error(e); out.innerHTML='<p>Error</p>'; }
-    }
-    document.addEventListener('DOMContentLoaded', load);
+      }catch(e){ console.error(e); box.innerHTML = '<p style="opacity:.7">Error loading certificates</p>'; }
+    });
+
+    // small helper
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
   </script>
 </body>
 </html>
