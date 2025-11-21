@@ -1,112 +1,225 @@
-// stars.js — Galaxy-style rotating starfield with radial cinematic meteors
+/* stars.js — DPR-aware twinkling multicolor stars + medium cinematic meteors */
 (() => {
   const canvas = document.getElementById('starsCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d', { alpha: true });
 
-  // DPR & sizing
   let DPR = Math.max(1, window.devicePixelRatio || 1);
-  let W = Math.max(300, innerWidth);
+  let W = Math.max(320, innerWidth);
   let H = Math.max(240, innerHeight);
-  function sizeCanvas() {
-    DPR = Math.max(1, window.devicePixelRatio || 1);
-    W = Math.max(300, innerWidth);
-    H = Math.max(240, innerHeight);
-    canvas.width = Math.round(W * DPR);
-    canvas.height = Math.round(H * DPR);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  }
-  sizeCanvas();
 
-  // center
-  let centerX = W / 2, centerY = H / 2;
-
-  // config
   const CONFIG = {
-    baseStarScale: 1 / 14000,
-    layers: [
-      { depth: 0.34, factor: 0.55, size: 0.5, twinkle: 0.004, hueRange: [200, 230], orbitMult: 0.018 },
-      { depth: 0.43, factor: 0.85, size: 0.95, twinkle: 0.006, hueRange: [220, 260], orbitMult: 0.045 },
-      { depth: 0.23, factor: 0.45, size: 1.6, twinkle: 0.01, hueRange: [260, 300], orbitMult: 0.12 }
+    baseStars: 260,
+    starPal: [
+      {h:200,s:80,l:85}, // cyan-ish
+      {h:230,s:70,l:86}, // bluish
+      {h:265,s:60,l:86}, // lavender
+      {h:45,s:88,l:74}   // warm-gold
     ],
-    meteor: {
-      maxActive: 28,
-      spawnIntervalMs: 700,
-      lengthMin: 160,
-      lengthMax: 420,
-      speedMin: 9,
-      speedMax: 24,
-      thicknessMin: 1.2,
-      thicknessMax: 3.2,
-      curveStrength: 0.0038,
-      gravity: 0.00095,
-      trailMax: 48
+    meteor:{
+      max:28,
+      spawnMs:700,
+      lenMin:160,
+      lenMax:420,
+      spMin:9,
+      spMax:24,
+      thickMin:1.4,
+      thickMax:3.2,
+      trailMax:48
     },
-    parallax: { strength: 40, verticalStrength: 28, lerpSpeed: 0.08 },
-    performance: { maxCanvasAreaForHighDetail: 1600 * 900 }
+    parallax: {strength:40, lerp:0.08},
+    perfLimit: 1600*900
   };
 
-  let stars = [], meteors = [];
-  let targetParallaxX = 0, targetParallaxY = 0, parallaxX = 0, parallaxY = 0;
-  let lastTick = performance.now(), lastMeteorSpawn = performance.now(), lastMouseTime = 0;
+  function sizeCanvas(){
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+    W = Math.max(320, innerWidth);
+    H = Math.max(240, innerHeight);
+    canvas.width = Math.round(W*DPR);
+    canvas.height = Math.round(H*DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs = setTimeout(sizeCanvas,120); });
 
   const rand = (a,b) => Math.random()*(b-a)+a;
+  const choice = arr => arr[Math.floor(Math.random()*arr.length)];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 
-  function buildStars() {
-    stars.length = 0;
-    const area = W * H;
-    const baseCount = Math.max(90, Math.floor(area * CONFIG.baseStarScale));
-    const arms = 3;
-    const armSeparation = (Math.PI * 2) / arms;
-    const maxRadius = Math.min(W, H) * 0.56;
-    for (let li=0; li<CONFIG.layers.length; li++){
-      const layer = CONFIG.layers[li];
-      let count = Math.round(baseCount * layer.factor);
-      if (W*H < CONFIG.performance.maxCanvasAreaForHighDetail) count = Math.round(count * 0.66);
-      for (let i=0;i<count;i++){
-        const arm = i % arms;
-        const radius = Math.pow(Math.random(),0.9)*maxRadius*layer.depth*(0.72 + Math.random()*0.6);
-        const baseAngle = arm*armSeparation + radius*0.005;
-        const angle = baseAngle + rand(-0.6,0.6);
-        const hue = rand(layer.hueRange[0], layer.hueRange[1]);
-        stars.push({
-          layer: li,
-          rbase: layer.size*(0.6 + Math.random()*1.2),
-          hue: Math.floor(hue),
-          alpha: rand(0.12, 0.95),
-          twinkleSpd: layer.twinkle*(0.6 + Math.random()*1.4),
-          radius, angle,
-          orbitSpeed: (0.0007 + Math.random()*0.0018)*(1 + layer.orbitMult),
-          offsetX: rand(-10,10)*layer.depth,
-          offsetY: rand(-8,8)*layer.depth
-        });
+  let stars = [];
+  let meteors = [];
+  let lastTick = performance.now();
+  let lastSpawn = performance.now();
+  let parX = 0, parY = 0, tParX = 0, tParY = 0, lastMouse = 0;
+
+  function buildStars(){
+    stars = [];
+    const area = W*H;
+    let count = Math.round(CONFIG.baseStars * Math.sqrt((W*H)/(1366*768)));
+    if(W*H < CONFIG.perfLimit) count = Math.round(count*0.7);
+    for(let i=0;i<count;i++){
+      const c = choice(CONFIG.starPal);
+      stars.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        r: Math.random()*1.6 + 0.2,
+        hue: c.h, sat: c.s, light: c.l,
+        phase: Math.random()*Math.PI*2,
+        tw: Math.random()*0.012 + 0.002,
+        layer: Math.random()
+      });
+    }
+  }
+  buildStars();
+
+  function spawnMeteor(){
+    if(meteors.length >= CONFIG.meteor.max) return;
+    const sx = rand(0.2*W, 0.9*W);
+    const sy = rand(-0.06*H, 0.06*H);
+    const ang = rand(-0.9, -0.4); // down-left heavy
+    const sp = rand(CONFIG.meteor.spMin, CONFIG.meteor.spMax);
+    const len = rand(CONFIG.meteor.lenMin, CONFIG.meteor.lenMax);
+    const thick = rand(CONFIG.meteor.thickMin, CONFIG.meteor.thickMax);
+    const hue = Math.random() < 0.72 ? 205 : 42;
+    meteors.push({
+      x:sx,y:sy,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,len,thick,hue,life:0,maxLife:rand(90,170),trail:[]
+    });
+  }
+
+  function onPointer(x,y){
+    lastMouse = performance.now();
+    const rx = (x / W) - 0.5;
+    const ry = (y / H) - 0.5;
+    tParX = rx * CONFIG.parallax.strength;
+    tParY = ry * CONFIG.parallax.strength * 0.7;
+  }
+  window.addEventListener('mousemove', e => onPointer(e.clientX, e.clientY));
+  window.addEventListener('touchmove', e => { if(e.touches && e.touches[0]) onPointer(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+
+  function render(now){
+    const dt = Math.min(40, now - lastTick);
+    lastTick = now;
+    parX += (tParX - parX) * CONFIG.parallax.lerp;
+    parY += (tParY - parY) * CONFIG.parallax.lerp;
+
+    ctx.clearRect(0,0,W,H);
+
+    // subtle nebula
+    const neb = ctx.createRadialGradient(W*0.5 + parX*0.02, H*0.45 + parY*0.02, 0, W*0.6, H*0.6, Math.max(W,H)*0.9);
+    neb.addColorStop(0, 'rgba(110,36,220,0.02)');
+    neb.addColorStop(0.5, 'rgba(6,10,20,0.02)');
+    neb.addColorStop(1, 'rgba(6,10,20,0)');
+    ctx.fillStyle = neb; ctx.fillRect(0,0,W,H);
+
+    const t = now*0.001;
+    // stars
+    for(const s of stars){
+      const tw = Math.sin(t*2 + s.phase) * s.tw * 0.9;
+      const alpha = clamp(0.35 + tw + s.layer*0.6, 0.05, 1);
+      const sx = s.x + parX*(0.15 + s.layer*0.9);
+      const sy = s.y + parY*(0.08 + s.layer*0.6);
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(${s.hue},${s.sat}%,${s.light}%,${alpha})`;
+      ctx.arc(sx, sy, s.r*(1 + s.layer*0.6), 0, Math.PI*2); ctx.fill();
+      const hr = s.r*6;
+      const g = ctx.createRadialGradient(sx,sy,0,sx,sy,hr); g.addColorStop(0, `hsla(${s.hue},${s.sat}%,${s.light}%,${alpha*0.12})`); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(sx-hr,sy-hr,hr*2,hr*2);
+    }
+
+    // meteors
+    for(let i=meteors.length-1;i>=0;i--){
+      const m = meteors[i];
+      m.life += dt*0.06;
+      m.vx += Math.sin(t + m.life*0.03) * 0.0018 * dt;
+      m.vy += 0.0009 * dt;
+      m.x += m.vx * (dt*0.06);
+      m.y += m.vy * (dt*0.06);
+      m.trail.unshift({x:m.x,y:m.y});
+      if(m.trail.length > CONFIG.meteor.trailMax) m.trail.length = CONFIG.meteor.trailMax;
+
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for(let ti=0; ti<m.trail.length; ti++){
+        const p = m.trail[ti];
+        const ratio = ti / m.trail.length;
+        const alpha = clamp((1-ratio) * 0.7 * (1 - (m.life/m.maxLife)), 0, 0.95);
+        const rad = Math.max(1, (1 - ratio) * m.thick * 6);
+        const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad*1.8);
+        g.addColorStop(0, `hsla(${m.hue},92%,66%,${alpha})`);
+        g.addColorStop(0.45, `hsla(${m.hue},82%,56%,${alpha*0.45})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x,p.y,rad,0,Math.PI*2); ctx.fill();
       }
+      ctx.beginPath(); ctx.fillStyle = `hsla(${m.hue},92%,72%,1)`; ctx.arc(m.x,m.y, Math.max(1.2,m.thick*1.6), 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+
+      if(m.life > m.maxLife || m.x < -W*0.7 || m.x > W*1.6 || m.y > H*1.5) meteors.splice(i,1);
+    }
+
+    // spawn
+    if(performance.now() - lastSpawn > CONFIG.meteor.spawnMs * (0.6 + Math.random()*1.8)){
+      spawnMeteor();
+      if(Math.random()<0.16) spawnMeteor();
+      lastSpawn = performance.now();
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  function spawnMeteor(){ /* placeholder, built above */ }
+  // we already have spawnMeteor above; just keep function name: done
+
+  // kick off
+  lastSpawn = performance.now();
+  requestAnimationFrame(render);
+
+  // rebuild stars on resize
+  window.addEventListener('resize', ()=>{ clearTimeout(window._rs2); window._rs2 = setTimeout(()=>{ sizeCanvas(); buildStars(); }, 140); });
+
+  function buildStars(){ /* declared earlier */ } // buildStars exists above; keep consistent
+  // Re-declare buildStars (actual)
+  function buildStars(){
+    stars = [];
+    let count = Math.round(CONFIG.baseStars * Math.sqrt((W*H)/(1366*768)));
+    if(W*H < CONFIG.perfLimit) count = Math.round(count*0.7);
+    for(let i=0;i<count;i++){
+      const c = choice(CONFIG.starPal);
+      stars.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        r: Math.random()*1.6 + 0.2,
+        hue: c.h, sat: c.s, light: c.l,
+        phase: Math.random()*Math.PI*2,
+        tw: Math.random()*0.012 + 0.002,
+        layer: Math.random()
+      });
     }
   }
 
-  function spawnMeteorRadial() {
-    const cfg = CONFIG.meteor;
-    if (meteors.length >= cfg.maxActive) return;
-    const sx = centerX + rand(-W*0.06, W*0.06);
-    const sy = centerY + rand(-H*0.06, H*0.06);
-    const angle = rand(0, Math.PI*2);
-    const speed = rand(cfg.speedMin, cfg.speedMax);
-    const length = rand(cfg.lengthMin, cfg.lengthMax);
-    const thickness = rand(cfg.thicknessMin, cfg.thicknessMax);
-    const hue = Math.random() < 0.74 ? rand(200,235) : rand(36,58);
-    const sat = hue > 100 ? 85 : 96;
-    const light = hue > 100 ? 70 : 62;
-    meteors.push({
-      x: sx, y: sy,
-      vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
-      vxVar: rand(-1.8,1.8), vyVar: rand(-1.0,1.0),
-      length, life:0, maxLife: rand(80,170),
-      thickness, hue: Math.floor(hue), sat, light, trail: []
-    });
-    if (meteors.length > cfg.maxActive) meteors.shift();
+  // helper functions defined earlier (rand/choice/clamp) are available
+
+  // small idle parallax decay
+  setInterval(()=> { if(performance.now() - lastMouse > 2400){ tParX *= 0.92; tParY *= 0.92; } }, 800);
+
+  // ensure pointer variables exist in outer scope
+  function spawnMeteor(){ /* implemented above copy - reusing previous function from closure */ 
+    if(meteors.length >= CONFIG.meteor.max) return;
+    const sx = rand(0.2*W, 0.9*W);
+    const sy = rand(-0.06*H, 0.06*H);
+    const ang = rand(-0.9, -0.4);
+    const sp = rand(CONFIG.meteor.spMin, CONFIG.meteor.spMax);
+    const len = rand(CONFIG.meteor.lenMin, CONFIG.meteor.lenMax);
+    const thick = rand(CONFIG.meteor.thickMin, CONFIG.meteor.thickMax);
+    const hue = Math.random() < 0.72 ? 205 : 42;
+    meteors.push({ x:sx,y:sy,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,len,thick,hue,life:0,maxLife:rand(90,170),trail:[] });
+  }
+
+  // init
+  buildStars();
+  sizeCanvas();
+
+})();    if (meteors.length > cfg.maxActive) meteors.shift();
   }
 
   function softRadial(x,y,r,h,s,l,a){
