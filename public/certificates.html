@@ -1,23 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Certificates — Aanchal Yadav</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* small helper for initials avatar */
-    .avatar-initials{
-      width:88px;height:88px;border-radius:50%;display:grid;place-items:center;
-      background:linear-gradient(90deg,var(--gold),var(--neon1));
-      color:#02101a;font-weight:700;font-size:28px;letter-spacing:1px;
-      box-shadow:0 8px 30px rgba(125,211,252,0.06);
-    }
-    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-    @media (max-width:880px){ .cards{grid-template-columns:1fr} }
-    .cert-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-    .cert-thumb{height:88px;width:100%;object-fit:cover;border-radius:8px;margin-bottom:8px}
-  </style>
+  <script src="firebase.js" defer></script>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
@@ -29,49 +17,51 @@
     <a href="login.html" class="trm-item">Admin</a>
   </nav>
 
-  <main class="container" style="padding-top:80px;">
-    <header style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-      <div class="avatar-initials">AY</div>
+  <div class="float-nav">
+    <button class="float-btn" data-href="index.html">🏠</button>
+    <button class="float-btn" data-href="certificates.html">📜</button>
+    <button class="float-btn" data-href="internships.html">💼</button>
+    <button class="float-btn" data-href="projects.html">🧩</button>
+  </div>
+
+  <main class="container" style="padding-top:80px">
+    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div class="ay-avatar avatar">AY</div>
       <div>
         <h2 style="margin:0">Certificates</h2>
-        <div style="color:var(--muted);margin-top:4px">Verified and earned certificates</div>
+        <div style="color:var(--muted)">All certificates & verification links</div>
       </div>
     </header>
 
-    <section id="certGrid" class="cards">
-      <!-- cards injected by JS -->
+    <section id="certGrid" class="cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px">
+      <!-- injected -->
     </section>
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  <script src="avatar.js" defer></script>
+  <script src="script.js" defer></script>
   <script>
-    // load certificates and render responsive grid/list
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const box = document.getElementById('certGrid');
-      box.innerHTML = '<p style="opacity:.6">Loading…</p>';
+      if(!window.db) return;
+      const box = document.getElementById('certGrid'); box.innerHTML = '<p style="opacity:.6">Loading…</p>';
       try{
         const doc = await db.collection('certificates').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
         if(!items.length){ box.innerHTML = '<p style="opacity:.7">No certificates yet.</p>'; return; }
         box.innerHTML = '';
         items.forEach(it=>{
-          const el = document.createElement('div'); el.className='cert-card cardItem';
-          el.innerHTML = `
-            ${it.image ? `<img src="${it.image}" class="cert-thumb" alt="${it.title}">` : ''}
-            <strong>${escapeHtml(it.title)}</strong>
-            <div style="color:var(--muted);font-size:13px;margin-top:6px">${escapeHtml(it.issuer||'')}</div>
-            ${it.link ? `<div style="margin-top:8px"><a href="${it.link}" target="_blank" class="btn-ghost">View certificate</a></div>` : ''}
-          `;
+          const el = document.createElement('div'); el.className='cardItem card';
+          el.innerHTML = `${it.image?`<img src="${it.image}" style="width:100%;border-radius:8px;margin-bottom:8px">`:''}
+            <strong>${(it.title||'Untitled')}</strong>
+            <div style="color:var(--muted);font-size:13px;margin-top:6px">${(it.issuer||'')}</div>
+            ${it.link? `<div style="margin-top:8px"><a href="${it.link}" target="_blank" class="btn-ghost">View</a></div>`:''}`;
           box.appendChild(el);
         });
-      }catch(e){ console.error(e); box.innerHTML = '<p style="opacity:.7">Error loading certificates</p>'; }
+      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error loading</p>'; }
     });
-
-    // small helper
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
   </script>
 </body>
 </html>
