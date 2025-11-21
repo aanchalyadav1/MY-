@@ -1,64 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Projects — Aanchal Yadav</title>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Projects — Aanchal</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <link rel="stylesheet" href="style.css">
-  <script src="firebase.js" defer></script>
 </head>
 <body>
-  <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <nav class="top-right-menu">
-    <a href="index.html" class="trm-item">Home</a>
-    <a href="certificates.html" class="trm-item">Certificates</a>
-    <a href="internships.html" class="trm-item">Internships</a>
-    <a href="projects.html" class="trm-item">Projects</a>
-    <a href="login.html" class="trm-item">Admin</a>
-  </nav>
-
-  <div class="float-nav">
-    <button class="float-btn" data-href="index.html">🏠</button>
-    <button class="float-btn" data-href="certificates.html">📜</button>
-    <button class="float-btn" data-href="internships.html">💼</button>
-    <button class="float-btn" data-href="projects.html">🧩</button>
-  </div>
-
-  <main class="container" style="padding-top:80px">
-    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <div class="ay-avatar avatar">AY</div>
-      <div>
-        <h2 style="margin:0">Projects</h2>
-        <div style="color:var(--muted)">Selected projects and demos</div>
-      </div>
-    </header>
-
-    <section id="projGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px"></section>
+  <nav class="top-right-menu"><a href="index.html" class="trm-item">Home</a><a href="admin.html" class="trm-item">Admin</a></nav>
+  <main class="container">
+    <h1>Projects</h1>
+    <div id="projects" class="list"></div>
   </main>
+  <div id="toasts" class="toasts"></div>
 
-  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
-
-  <script src="stars.js" defer></script>
-  <script src="avatar.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="firebase.js" defer></script>
+  <script src="global.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      if(!window.db) return;
-      const box = document.getElementById('projGrid'); box.innerHTML='<p style="opacity:.6">Loading…</p>';
-      try{
-        const doc = await db.collection('projects').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
-        if(!items.length){ box.innerHTML='<p style="opacity:.7">No projects yet.</p>'; return; }
-        box.innerHTML = '';
-        items.forEach(p=>{
-          const el = document.createElement('div'); el.className='cardItem card';
-          el.innerHTML = `${p.image?`<img src="${p.image}" style="width:100%;border-radius:8px;margin-bottom:8px">`:''}
-            <strong>${(p.name||'Untitled')}</strong>
-            <div style="color:var(--muted);font-size:13px;margin-top:6px">${(p.desc||'')}</div>
-            ${p.url?`<div style="margin-top:8px"><a href="${p.url}" target="_blank" class="btn-ghost">Open</a></div>`:''}`;
-          box.appendChild(el);
+    (function(){
+      const db = window.db;
+      const wrap = document.getElementById('projects');
+      if(!db){ wrap.innerHTML = '<p style="opacity:.8">Firebase not loaded</p>'; return; }
+      showSkeleton && showSkeleton('#projects', 3);
+      db.collection('projects').doc('list').get().then(doc=>{
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+        wrap.innerHTML = items.length ? '' : '<p style="opacity:.8">No projects</p>';
+        items.forEach(it=>{
+          const row=document.createElement('div'); row.className='list-row';
+          row.innerHTML = `<div style="display:flex;gap:10px;align-items:center">${it.image?`<img src="${it.image}" class="preview-img">`:''}<div><strong>${it.name}</strong><div style="color:var(--muted)">${it.desc||''}</div></div></div>`;
+          wrap.appendChild(row);
         });
-      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error loading</p>'; }
-    });
+      }).catch(e=>{ console.error(e); wrap.innerHTML='<p style="opacity:.8">Error</p>'; });
+    })();
   </script>
 </body>
 </html>
