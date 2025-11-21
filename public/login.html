@@ -1,70 +1,60 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Login — Admin</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Login — Aanchal</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  <style>
+    .login-wrap{min-height:85vh;display:grid;place-items:center}
+    .login-card{width:360px;padding:20px;border-radius:12px}
+    .oauth-btn{width:100%;padding:10px;border-radius:10px;border:none;cursor:pointer;margin-top:8px}
+  </style>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <nav class="top-right-menu" aria-label="Primary"><a href="index.html" class="trm-item">Home</a></nav>
 
-  <div class="login-wrap">
+  <main class="login-wrap">
     <div class="login-card card">
-      <h2 style="color:var(--neon1);margin:0 0 8px 0">Admin Login</h2>
-      <p style="color:var(--muted);margin:0 0 12px 0">Sign in to manage Certificates, Internships & Projects.</p>
+      <h3 style="margin:0 0 8px 0">Admin Sign in</h3>
+      <div style="color:var(--muted);margin-bottom:10px">Sign in with Google or email</div>
 
-      <div style="display:flex;gap:8px;flex-direction:column;margin-top:10px">
-        <button id="googleSign" class="btn">Sign in with Google</button>
+      <button id="googleBtn" class="oauth-btn" style="background:linear-gradient(90deg,#fff 0%, #e8f9ff 100%);">Sign in with Google</button>
 
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input id="email" placeholder="Email" type="email">
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input id="pass" placeholder="Password" type="password">
-        </div>
+      <hr style="margin:12px 0"/>
 
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="emailSign" class="btn">Sign In</button>
-          <button id="emailCreate" class="btn-ghost">Create</button>
-        </div>
+      <input id="email" type="email" placeholder="Email" style="margin-bottom:8px"/>
+      <input id="password" type="password" placeholder="Password" style="margin-bottom:8px"/>
+      <button id="emailSign" class="btn">Sign in with Email</button>
 
-        <p style="color:var(--muted);margin-top:10px;font-size:13px">Only emails listed in the Firestore `admin/list` doc can access admin features.</p>
-      </div>
+      <p style="opacity:.8;margin-top:10px;font-size:13px">Only admin emails in Firestore (admin/list) can access admin dashboard.</p>
     </div>
-  </div>
+  </main>
 
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const auth = window.auth || firebase.auth();
-      const googleSign = document.getElementById('googleSign');
-      const emailSign = document.getElementById('emailSign');
-      const emailCreate = document.getElementById('emailCreate');
-
-      googleSign.addEventListener('click', async ()=>{
+    // firebase must be initialized in ../scripts/firebase.js and window.auth available
+    document.addEventListener('DOMContentLoaded', ()=> {
+      const googleBtn = document.getElementById('googleBtn');
+      const emailBtn = document.getElementById('emailSign');
+      googleBtn.addEventListener('click', ()=> {
         const provider = new firebase.auth.GoogleAuthProvider();
-        try{ await auth.signInWithPopup(provider); location.href='admin.html'; }
-        catch(e){ alert(e.message); }
+        auth.signInWithPopup(provider).then(()=>{ window.location='admin.html' }).catch(e=>alert(e.message));
       });
-
-      emailSign.addEventListener('click', async ()=>{
+      emailBtn.addEventListener('click', async ()=>{
         const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        try{ await auth.signInWithEmailAndPassword(email,pass); location.href='admin.html'; }
-        catch(e){ alert(e.message); }
-      });
-
-      emailCreate.addEventListener('click', async ()=>{
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        if(!email || !pass) return alert('Enter email & password');
-        try{ await auth.createUserWithEmailAndPassword(email,pass); alert('Account created — ask an existing admin to add your email to the admin list'); }
-        catch(e){ alert(e.message); }
+        const pw = document.getElementById('password').value;
+        try{
+          await auth.signInWithEmailAndPassword(email,pw);
+          window.location='admin.html';
+        }catch(e){
+          if(e.code==='auth/user-not-found'){
+            // try create
+            try{ await auth.createUserWithEmailAndPassword(email,pw); window.location='admin.html'; }
+            catch(err){ alert(err.message); }
+          } else alert(e.message);
+        }
       });
     });
   </script>
