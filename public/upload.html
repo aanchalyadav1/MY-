@@ -1,26 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Upload — Admin helper</title><link rel="stylesheet" href="style.css"><script src="firebase.js" defer></script></head>
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Upload — Admin</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <main style="min-height:80vh;display:grid;place-items:center">
-    <div class="card" style="width:420px;padding:20px">
-      <h4>Upload Helper</h4>
-      <input id="fileInput" type="file" accept="image/*"><div id="filePreview" style="margin-top:8px">Preview</div>
-      <button id="uploadBtn" class="btn" style="margin-top:10px">Upload</button>
-      <p style="opacity:.7;margin-top:12px">Uploads to Firebase Storage under /uploads/</p>
+  <nav class="top-right-menu"><a href="admin.html" class="trm-item">Admin</a></nav>
+  <main class="container">
+    <h1>Upload File</h1>
+    <div class="card">
+      <input type="file" id="fileInput" />
+      <div style="margin-top:10px">
+        <button id="uploadBtn" class="btn">Upload to Storage</button>
+      </div>
     </div>
+    <div id="result"></div>
   </main>
+  <div id="toasts" class="toasts"></div>
 
-  <script src="stars.js" defer></script>
+  <script src="firebase.js" defer></script>
+  <script src="global.js" defer></script>
   <script>
-    document.getElementById('fileInput').addEventListener('change', e=>{
-      const f = e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(ev)=> document.getElementById('filePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;border-radius:8px">`; r.readAsDataURL(f);
-    });
-    document.getElementById('uploadBtn').addEventListener('click', async ()=>{
-      const f = document.getElementById('fileInput').files[0]; if(!f) return alert('Choose file');
-      const name = Date.now() + '_' + f.name.replace(/\s+/g,'_'), ref = window.storage.ref().child('uploads/'+name); await ref.put(f); const url = await ref.getDownloadURL(); alert('Uploaded: '+url);
-    });
+    (function(){
+      const storage = window.storage;
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const result = document.getElementById('result');
+      uploadBtn.addEventListener('click', async () => {
+        const f = fileInput.files[0];
+        if(!f){ toast('Select a file', {type:'error'}); return; }
+        const name = Date.now() + '_' + f.name.replace(/\s+/g,'_');
+        const ref = storage.ref().child('uploads/' + name);
+        toast('Uploading...');
+        try{
+          await ref.put(f);
+          const url = await ref.getDownloadURL();
+          result.innerHTML = `<p>Uploaded: <a href="${url}" target="_blank">Open</a></p>`;
+          toast('Upload complete');
+        }catch(e){ console.error(e); toast('Upload failed', {type:'error'}); }
+      });
+    })();
   </script>
 </body>
 </html>
