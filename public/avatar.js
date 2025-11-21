@@ -1,18 +1,19 @@
-// avatar.js - animated AY hologram badge
+// avatar.js - floating hologram AY badge
 (function(){
+  if(document.getElementById('ay-avatar-holo')) return;
   const el = document.createElement('div');
   el.id = 'ay-avatar-holo';
   el.style.position = 'fixed';
   el.style.right = '18px';
   el.style.bottom = '18px';
-  el.style.zIndex = 50;
+  el.style.zIndex = 60;
   el.style.width = '64px';
   el.style.height = '64px';
   el.style.borderRadius = '50%';
   el.style.display = 'grid';
   el.style.placeItems = 'center';
   el.style.backdropFilter = 'blur(6px)';
-  el.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+  el.style.boxShadow = '0 12px 30px rgba(0,0,0,0.6)';
   el.style.background = 'radial-gradient(circle at 30% 30%, rgba(124,58,237,0.14), rgba(0,0,0,0.08))';
   el.innerHTML = `
     <svg width="48" height="48" viewBox="0 0 100 100" aria-hidden="true">
@@ -25,12 +26,7 @@
     </svg>
   `;
   document.body.appendChild(el);
-
-  let t=0;
-  function float(){
-    t += 0.02;
-    el.style.transform = `translateY(${Math.sin(t)*6}px) rotate(${Math.sin(t/2)*2}deg)`;
-    requestAnimationFrame(float);
-  }
+  let t = 0;
+  function float(){ t+=0.02; el.style.transform = `translateY(${Math.sin(t)*6}px) rotate(${Math.sin(t/2)*2}deg)`; requestAnimationFrame(float); }
   float();
 })();
