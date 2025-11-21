@@ -1,4 +1,4 @@
-// avatar.js - floating hologram AY badge
+// avatar.js - floating hologram AY badge (resilient)
 (function(){
   if(document.getElementById('ay-avatar-holo')) return;
   const el = document.createElement('div');
@@ -27,6 +27,12 @@
   `;
   document.body.appendChild(el);
   let t = 0;
-  function float(){ t+=0.02; el.style.transform = `translateY(${Math.sin(t)*6}px) rotate(${Math.sin(t/2)*2}deg)`; requestAnimationFrame(float); }
-  float();
+  function float(){ 
+    t += 0.02; 
+    // if element removed, stop
+    if(!document.body.contains(el)) return;
+    el.style.transform = `translateY(${Math.sin(t)*6}px) rotate(${Math.sin(t/2)*2}deg)`;
+    requestAnimationFrame(float); 
+  }
+  requestAnimationFrame(float);
 })();
