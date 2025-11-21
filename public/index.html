@@ -6,92 +6,67 @@
   <title>Aanchal Yadav — Home</title>
   <meta name="description" content="Aanchal Yadav — AI, Cybersecurity, Web Developer" />
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase libs (defer) -->
+  <!-- Firebase libs and init (firebase.js must be in project root) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js" defer></script>
+  <script src="firebase.js" defer></script>
 </head>
-
 <body>
-  <!-- Stars + Meteors canvas -->
-  <canvas id="starsCanvas" class="stars-canvas" aria-hidden="true"></canvas>
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
 
-  <!-- TOP NAV -->
-  <nav class="top-right-menu" aria-label="Primary">
+  <nav class="top-right-menu">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
     <a href="internships.html" class="trm-item">Internships</a>
     <a href="projects.html" class="trm-item">Projects</a>
-    <a href="login.html" class="trm-item admin-link">Admin</a>
+    <a href="login.html" class="trm-item">Admin</a>
   </nav>
 
-  <!-- FLOAT NAV -->
-  <div class="float-nav" role="navigation" aria-label="Quick nav">
-    <button class="float-btn" data-href="index.html" title="Home" aria-label="Home">🏠</button>
-    <button class="float-btn" data-href="certificates.html" title="Certificates" aria-label="Certificates">📜</button>
-    <button class="float-btn" data-href="internships.html" title="Internships" aria-label="Internships">💼</button>
-    <button class="float-btn" data-href="projects.html" title="Projects" aria-label="Projects">🧩</button>
+  <div class="float-nav">
+    <button class="float-btn" data-href="index.html">🏠</button>
+    <button class="float-btn" data-href="certificates.html">📜</button>
+    <button class="float-btn" data-href="internships.html">💼</button>
+    <button class="float-btn" data-href="projects.html">🧩</button>
   </div>
 
-  <!-- MAIN -->
   <main id="app" class="page">
     <header class="hero container">
       <div class="hero-inner">
-
-        <!-- HOLOGRAM -->
-        <div class="holo-wrap" id="holoWrap" aria-hidden="false">
+        <div class="holo-wrap">
           <div class="ring r1"></div>
           <div class="ring r2"></div>
 
-          <div class="holo-card" id="holoCard" role="img" aria-label="Holographic card">
-            <div class="avatar" id="avatarWrap" aria-hidden="true">
-              <img id="avatarImg" src="https://i.ibb.co/89M7t9K/abstract-avatar.png" alt="abstract avatar" />
-            </div>
-
+          <div class="holo-card">
+            <div class="avatar ay-avatar">AY</div>
             <div class="meta">
-              <h3 class="meta-name">Aanchal Yadav</h3>
-              <p class="meta-sub">3rd-year CSE • AI • Cybersecurity</p>
+              <h3>Aanchal Yadav</h3>
+              <p>3rd-year CSE • AI • Cybersecurity</p>
             </div>
-
             <div class="reflect"></div>
             <div class="scanlines"></div>
           </div>
         </div>
 
-        <!-- HERO TEXT -->
-        <div class="hero-text">
-          <div class="hero-title">Hey there! I’m <span class="accent">Aanchal Yadav</span></div>
+        <div class="hero-text reveal">
+          <div class="hero-title">Hey there! I’m <span style="color:var(--gold)">Aanchal</span></div>
           <div class="hero-sub">AI • Cybersecurity • Web Developer</div>
 
-          <div class="hero-intro">
-            <p class="reveal">I’m a 3rd-year Computer Science Engineering student at Sushila Devi Bansal College of Engineering, Indore — passionate about Artificial Intelligence, Cybersecurity, and everything tech!</p>
-
-            <p class="reveal" style="margin-top:12px">Over the last few months, I’ve been exploring the real-world side of what we study in class by doing multiple virtual internships, earning certifications, and building projects that bring theory to life. Whether it's training an AI model, securing data with cryptography, or building interactive front-ends — I learn by doing.</p>
-
-            <p class="reveal" style="margin-top:12px">Some things I’ve enjoyed building:</p>
-            <ul class="reveal" style="margin-top:8px;line-height:1.7">
-              <li>🎨 Image generation & prompt engineering (Stable Diffusion)</li>
-              <li>🔒 Secure data hiding & steganography experiments</li>
-              <li>🧠 Movie recommendation systems (ML)</li>
-              <li>🌐 Personal interactive webpages with HTML/CSS/JS</li>
-              <li>💡 Generative AI projects and prototypes</li>
-            </ul>
-
-            <p class="reveal" style="margin-top:12px">I’ve completed certifications from IBM, Microsoft, Google, Cisco, HP LIFE, and more — each helping me level up.</p>
+          <div class="hero-intro" style="margin-top:12px">
+            <p>I’m a 3rd-year Computer Science Engineering student at Sushila Devi Bansal College of Engineering, Indore — passionate about AI, cybersecurity and web technologies. I build, learn and iterate.</p>
+            <p style="margin-top:12px">I’ve completed multiple virtual internships, earned certifications and shipped projects combining ML, security and web UX.</p>
           </div>
 
-          <div class="social-row reveal">
-            <a href="https://github.com/aanchalyadav1" target="_blank" class="social-btn git" aria-label="GitHub">GitHub</a>
-            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" target="_blank" class="social-btn ln" aria-label="LinkedIn">LinkedIn</a>
+          <div class="social-row" style="margin-top:12px">
+            <a href="https://github.com/aanchalyadav1" class="social-btn" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/aanchal-yadav-807165263/" class="social-btn" target="_blank">LinkedIn</a>
           </div>
-
         </div>
       </div>
     </header>
 
-    <section class="preview-grid container">
+    <section class="preview-grid container reveal" style="margin-top:24px">
       <div>
         <h4 style="color:var(--muted)">Recent Certificates</h4>
         <div id="previewCerts" class="list"></div>
@@ -101,12 +76,44 @@
         <div id="previewProjects" class="list"></div>
       </div>
     </section>
-
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
-  <!-- SCRIPTS (order matters) -->
+  <script src="stars.js" defer></script>
+  <script src="avatar.js" defer></script>
+  <script src="script.js" defer></script>
+  <script>
+    // load small previews from firestore (if db available)
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      if(!window.db) return;
+      try{
+        const certRef = db.collection('certificates').doc('list');
+        const certDoc = await certRef.get();
+        const certs = certDoc.exists && Array.isArray(certDoc.data().items) ? certDoc.data().items.slice().reverse().slice(0,4) : [];
+        const cBox = document.getElementById('previewCerts');
+        cBox.innerHTML = certs.length? '' : '<p style="opacity:.7">No certificates yet.</p>';
+        certs.forEach(c=> {
+          const el = document.createElement('div'); el.className='cardItem card';
+          el.innerHTML = `<strong>${(c.title||'Untitled')}</strong><div style="color:var(--muted);font-size:13px">${(c.issuer||'')}</div>`;
+          cBox.appendChild(el);
+        });
+
+        const projRef = db.collection('projects').doc('list');
+        const projDoc = await projRef.get();
+        const projs = projDoc.exists && Array.isArray(projDoc.data().items) ? projDoc.data().items.slice().reverse().slice(0,4) : [];
+        const pBox = document.getElementById('previewProjects');
+        pBox.innerHTML = projs.length? '' : '<p style="opacity:.7">No projects yet.</p>';
+        projs.forEach(p => {
+          const el = document.createElement('div'); el.className='cardItem card';
+          el.innerHTML = `<strong>${(p.name||'Untitled')}</strong><div style="color:var(--muted);font-size:13px">${(p.desc||'')}</div>`;
+          pBox.appendChild(el);
+        });
+      }catch(e){ console.warn('preview load error', e); }
+    });
+  </script>
+</body>
+</html>  <!-- SCRIPTS (order matters) -->
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
   <script src="auth.js" defer></script>
