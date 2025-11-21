@@ -1,67 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Certificates — Aanchal Yadav</title>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Certificates — Aanchal</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <link rel="stylesheet" href="style.css">
-  <script src="firebase.js" defer></script>
 </head>
 <body>
-  <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <nav class="top-right-menu">
-    <a href="index.html" class="trm-item">Home</a>
-    <a href="certificates.html" class="trm-item">Certificates</a>
-    <a href="internships.html" class="trm-item">Internships</a>
-    <a href="projects.html" class="trm-item">Projects</a>
-    <a href="login.html" class="trm-item">Admin</a>
-  </nav>
-
-  <div class="float-nav">
-    <button class="float-btn" data-href="index.html">🏠</button>
-    <button class="float-btn" data-href="certificates.html">📜</button>
-    <button class="float-btn" data-href="internships.html">💼</button>
-    <button class="float-btn" data-href="projects.html">🧩</button>
-  </div>
-
-  <main class="container" style="padding-top:80px">
-    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <div class="ay-avatar avatar">AY</div>
-      <div>
-        <h2 style="margin:0">Certificates</h2>
-        <div style="color:var(--muted)">All certificates & verification links</div>
-      </div>
-    </header>
-
-    <section id="certGrid" class="cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px">
-      <!-- injected -->
-    </section>
+  <nav class="top-right-menu"><a href="index.html" class="trm-item">Home</a><a href="admin.html" class="trm-item">Admin</a></nav>
+  <main class="container">
+    <h1>Certificates</h1>
+    <div id="certs" class="list"></div>
   </main>
+  <div id="toasts" class="toasts"></div>
 
-  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
-
-  <script src="stars.js" defer></script>
-  <script src="avatar.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="firebase.js" defer></script>
+  <script src="global.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      if(!window.db) return;
-      const box = document.getElementById('certGrid'); box.innerHTML = '<p style="opacity:.6">Loading…</p>';
-      try{
-        const doc = await db.collection('certificates').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
-        if(!items.length){ box.innerHTML = '<p style="opacity:.7">No certificates yet.</p>'; return; }
-        box.innerHTML = '';
-        items.forEach(it=>{
-          const el = document.createElement('div'); el.className='cardItem card';
-          el.innerHTML = `${it.image?`<img src="${it.image}" style="width:100%;border-radius:8px;margin-bottom:8px">`:''}
-            <strong>${(it.title||'Untitled')}</strong>
-            <div style="color:var(--muted);font-size:13px;margin-top:6px">${(it.issuer||'')}</div>
-            ${it.link? `<div style="margin-top:8px"><a href="${it.link}" target="_blank" class="btn-ghost">View</a></div>`:''}`;
-          box.appendChild(el);
+    (function(){
+      const db = window.db;
+      const wrap = document.getElementById('certs');
+      if(!db){ wrap.innerHTML = '<p style="opacity:.8">Firebase not loaded</p>'; return; }
+      showSkeleton && showSkeleton('#certs', 4);
+      db.collection('certificates').doc('list').get().then(doc=>{
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+        wrap.innerHTML = items.length ? '' : '<p style="opacity:.8">No certificates</p>';
+        items.forEach(c=>{
+          const row=document.createElement('div'); row.className='list-row';
+          row.innerHTML = `<div style="display:flex;gap:10px;align-items:center">${c.image?`<img src="${c.image}" class="preview-img">`:''}<div><strong>${c.title}</strong><div style="color:var(--muted)">${c.issuer||''}</div></div></div>`;
+          wrap.appendChild(row);
         });
-      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error loading</p>'; }
-    });
+      }).catch(e=>{ console.error(e); wrap.innerHTML='<p style="opacity:.8">Error</p>'; });
+    })();
   </script>
 </body>
 </html>
