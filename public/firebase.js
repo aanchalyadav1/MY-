@@ -1,4 +1,6 @@
-// scripts/firebase.js (v8)
+// firebase.js — initialize Firebase (v8) and export db + auth + storage to window
+// Replace config values only if needed.
+
 var firebaseConfig = {
   apiKey: "AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzw",
   authDomain: "portfolio-d3ea2.firebaseapp.com",
@@ -9,9 +11,15 @@ var firebaseConfig = {
   measurementId: "G-8WP1PB41LZ"
 };
 
-if (!firebase.apps.length) {
+if(!window.firebaseApp){
   firebase.initializeApp(firebaseConfig);
+  window.firebaseApp = firebase.app();
+  window.db = firebase.firestore();
+  window.auth = firebase.auth();
+  window.storage = firebase.storage();
+  console.log('Firebase initialized');
+} else {
+  window.db = firebase.firestore();
+  window.auth = firebase.auth();
+  window.storage = firebase.storage();
 }
-window.db = firebase.firestore();
-window.auth = firebase.auth();
-window.storage = firebase.storage();
