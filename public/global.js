@@ -20,7 +20,6 @@
   window.toggleTheme = function(){
     const cur = localStorage.getItem('ay_theme') || 'dark';
     applyTheme(cur === 'dark' ? 'light' : 'dark');
-    // let scripts pick up change; quick reload applies CSS variables uniformly
     try{ document.documentElement.style.transition = 'background .25s ease'; }catch{}
   };
 
@@ -48,9 +47,11 @@
   };
 
   // fade-in
-  document.documentElement.style.opacity = 0;
-  window.addEventListener('load', ()=> {
-    document.documentElement.style.transition = 'opacity .45s ease';
-    document.documentElement.style.opacity = 1;
-  });
+  try{
+    document.documentElement.style.opacity = 0;
+    window.addEventListener('load', ()=> {
+      document.documentElement.style.transition = 'opacity .45s ease';
+      document.documentElement.style.opacity = 1;
+    });
+  }catch(e){}
 })();
