@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Internships — Aanchal Yadav</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .list-view{display:flex;flex-direction:column;gap:12px}
-    .intern-item{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-  </style>
+  <script src="firebase.js" defer></script>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
@@ -20,40 +16,46 @@
     <a href="login.html" class="trm-item">Admin</a>
   </nav>
 
-  <main class="container" style="padding-top:80px;">
-    <header style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-      <div class="avatar-initials">AY</div>
+  <div class="float-nav">
+    <button class="float-btn" data-href="index.html">🏠</button>
+    <button class="float-btn" data-href="certificates.html">📜</button>
+    <button class="float-btn" data-href="internships.html">💼</button>
+    <button class="float-btn" data-href="projects.html">🧩</button>
+  </div>
+
+  <main class="container" style="padding-top:80px">
+    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div class="ay-avatar avatar">AY</div>
       <div>
         <h2 style="margin:0">Internships</h2>
-        <div style="color:var(--muted);margin-top:4px">Practical experience & roles</div>
+        <div style="color:var(--muted)">Practical experience & roles</div>
       </div>
     </header>
 
-    <section id="internList" class="list-view"></section>
+    <section id="internList" style="display:flex;flex-direction:column;gap:12px"></section>
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  <script src="avatar.js" defer></script>
+  <script src="script.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const box = document.getElementById('internList');
-      box.innerHTML = '<p style="opacity:.6">Loading…</p>';
+      if(!window.db) return;
+      const box = document.getElementById('internList'); box.innerHTML = '<p style="opacity:.6">Loading…</p>';
       try{
         const doc = await db.collection('internships').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-        if(!items.length){ box.innerHTML = '<p style="opacity:.7">No internships yet.</p>'; return; }
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
+        if(!items.length){ box.innerHTML='<p style="opacity:.7">No internships yet.</p>'; return; }
         box.innerHTML = '';
         items.forEach(it=>{
-          const el = document.createElement('div'); el.className='intern-item cardItem';
-          el.innerHTML = `<strong>${escapeHtml(it.company)}</strong>
-            <div style="color:var(--muted);margin-top:6px">${escapeHtml(it.role||'')} • ${escapeHtml(it.duration||'')}</div>`;
+          const el = document.createElement('div'); el.className='cardItem card';
+          el.innerHTML = `<strong>${(it.company||'')}</strong><div style="color:var(--muted);font-size:13px;margin-top:6px">${(it.role||'')} • ${(it.duration||'')}</div>`;
           box.appendChild(el);
         });
-      }catch(e){ console.error(e); box.innerHTML = '<p style="opacity:.7">Error loading internships</p>'; }
+      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error</p>'; }
     });
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
   </script>
 </body>
 </html>
