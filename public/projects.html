@@ -1,16 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Projects — Aanchal Yadav</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-    @media (max-width:880px){ .cards{grid-template-columns:1fr} }
-    .proj-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-    .proj-link{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);color:var(--muted);text-decoration:none}
-  </style>
+  <script src="firebase.js" defer></script>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
@@ -22,44 +16,49 @@
     <a href="login.html" class="trm-item">Admin</a>
   </nav>
 
-  <main class="container" style="padding-top:80px;">
-    <header style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-      <div class="avatar-initials">AY</div>
+  <div class="float-nav">
+    <button class="float-btn" data-href="index.html">🏠</button>
+    <button class="float-btn" data-href="certificates.html">📜</button>
+    <button class="float-btn" data-href="internships.html">💼</button>
+    <button class="float-btn" data-href="projects.html">🧩</button>
+  </div>
+
+  <main class="container" style="padding-top:80px">
+    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div class="ay-avatar avatar">AY</div>
       <div>
         <h2 style="margin:0">Projects</h2>
-        <div style="color:var(--muted);margin-top:4px">Selected projects & demos</div>
+        <div style="color:var(--muted)">Selected projects and demos</div>
       </div>
     </header>
 
-    <section id="projGrid" class="cards"></section>
+    <section id="projGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px"></section>
   </main>
 
   <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="../scripts/firebase.js" defer></script>
+  <script src="avatar.js" defer></script>
+  <script src="script.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const box = document.getElementById('projGrid');
-      box.innerHTML = '<p style="opacity:.6">Loading…</p>';
+      if(!window.db) return;
+      const box = document.getElementById('projGrid'); box.innerHTML='<p style="opacity:.6">Loading…</p>';
       try{
         const doc = await db.collection('projects').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-        if(!items.length){ box.innerHTML = '<p style="opacity:.7">No projects yet.</p>'; return; }
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
+        if(!items.length){ box.innerHTML='<p style="opacity:.7">No projects yet.</p>'; return; }
         box.innerHTML = '';
         items.forEach(p=>{
-          const el = document.createElement('div'); el.className='proj-card cardItem';
-          el.innerHTML = `
-            <strong>${escapeHtml(p.name)}</strong>
-            <div style="color:var(--muted);margin-top:6px">${escapeHtml(p.desc||'')}</div>
-            ${p.url ? `<a class="proj-link" href="${p.url}" target="_blank">Open project</a>` : ''}
-          `;
+          const el = document.createElement('div'); el.className='cardItem card';
+          el.innerHTML = `${p.image?`<img src="${p.image}" style="width:100%;border-radius:8px;margin-bottom:8px">`:''}
+            <strong>${(p.name||'Untitled')}</strong>
+            <div style="color:var(--muted);font-size:13px;margin-top:6px">${(p.desc||'')}</div>
+            ${p.url?`<div style="margin-top:8px"><a href="${p.url}" target="_blank" class="btn-ghost">Open</a></div>`:''}`;
           box.appendChild(el);
         });
-      }catch(e){ console.error(e); box.innerHTML = '<p style="opacity:.7">Error loading projects</p>'; }
+      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error loading</p>'; }
     });
-
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
   </script>
 </body>
 </html>
