@@ -1,11 +1,8 @@
-// auth.js - simple auth helpers used by admin.html and login.html
+// auth.js - simple login & signup redirect logic (v8 style)
 (function(){
   const auth = window.auth || (window.firebase && firebase.auth && firebase.auth());
 
-  // Login form handling (if present)
   const loginForm = document.getElementById('loginForm');
-  const signupForm = document.getElementById('signupForm');
-
   if(loginForm){
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -13,31 +10,20 @@
       const pass = loginForm.querySelector('input[name="password"]').value;
       try{
         await auth.signInWithEmailAndPassword(email, pass);
+        // redirect to admin: admin.js will check admin role and allow access
         window.location.href = 'admin.html';
       }catch(err){
         window.toast && window.toast(err.message || 'Login failed', {type:'error'});
+        console.error('login error', err);
       }
     });
   }
 
-  if(signupForm){
-    signupForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = signupForm.querySelector('input[name="email"]').value.trim();
-      const pass = signupForm.querySelector('input[name="password"]').value;
-      try{
-        await auth.createUserWithEmailAndPassword(email, pass);
-        window.location.href = 'admin.html';
-      }catch(err){
-        window.toast && window.toast(err.message || 'Signup failed', {type:'error'});
-      }
-    });
-  }
-
-  // Protect pages: if body has dataset.protect === 'true', redirect if not authed
-  if(document.body && document.body.dataset.protect === 'true'){
-    auth && auth.onAuthStateChanged(user => {
-      if(!user) location.href = 'login.html';
-    });
-  }
+  // Optional: signout helper
+  window.logout = async function(){
+    try{
+      await auth.signOut();
+      window.location.href = 'login.html';
+    }catch(e){ console.error(e); }
+  };
 })();
