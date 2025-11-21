@@ -1,58 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Login — Aanchal</title>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Admin</title>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
   <link rel="stylesheet" href="style.css">
-  <script src="firebase.js" defer></script>
 </head>
 <body>
-  <canvas id="starsCanvas" class="stars-canvas"></canvas>
-
-  <main style="min-height:80vh;display:grid;place-items:center">
-    <div class="card" style="width:380px;padding:22px;border-radius:12px">
-      <h3 style="margin:0 0 8px 0">Admin sign in</h3>
-      <div style="color:var(--muted);margin-bottom:10px">Sign in with Google or email/password</div>
-
-      <button id="googleBtn" class="btn" style="width:100%;margin-bottom:10px">Sign in with Google</button>
-
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="email" placeholder="Email" style="flex:1;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="password" placeholder="Password" type="password" style="flex:1;padding:10px;border-radius:8px;background:#061020;border:1px solid rgba(255,255,255,0.03);color:#dff">
-      </div>
-      <button id="emailSign" class="btn" style="width:100%;margin-top:10px">Sign in / Create</button>
-      <p style="opacity:.7;margin-top:10px;font-size:13px">Only admin emails in Firestore (admin/list) will get access to admin panel.</p>
+  <main class="container" style="display:grid;place-items:center;min-height:70vh">
+    <div class="card" style="width:420px">
+      <h2>Admin Login</h2>
+      <form id="loginForm">
+        <input type="email" name="email" class="input" placeholder="Email" required />
+        <input type="password" name="password" class="input" placeholder="Password" required />
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button type="submit" class="btn">Sign in</button>
+          <a href="index.html" class="btn-ghost" style="align-self:center;padding:8px 10px">Back</a>
+        </div>
+      </form>
     </div>
   </main>
 
-  <script src="stars.js" defer></script>
-  <script src="avatar.js" defer></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', ()=> {
-      const googleBtn = document.getElementById('googleBtn');
-      const emailBtn = document.getElementById('emailSign');
+  <div id="toasts" class="toasts"></div>
 
-      googleBtn.addEventListener('click', ()=>{
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).then(()=> window.location='admin.html').catch(e=> alert(e.message));
-      });
-
-      emailBtn.addEventListener('click', async ()=>{
-        const email = document.getElementById('email').value.trim();
-        const pw = document.getElementById('password').value;
-        if(!email || !pw){ alert('Enter email and password'); return; }
-        try{
-          await auth.signInWithEmailAndPassword(email,pw);
-          window.location='admin.html';
-        }catch(e){
-          if(e.code === 'auth/user-not-found'){
-            try{ await auth.createUserWithEmailAndPassword(email,pw); window.location='admin.html'; } catch(err){ alert(err.message); }
-          } else alert(e.message);
-        }
-      });
-    });
-  </script>
+  <script src="firebase.js" defer></script>
+  <script src="global.js" defer></script>
+  <script src="auth.js" defer></script>
 </body>
 </html>
