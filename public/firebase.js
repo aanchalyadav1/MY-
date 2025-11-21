@@ -1,5 +1,5 @@
-// firebase.js — FINAL CLEAN VERSION (Firebase v8)
-// Do NOT modify anything except the config if needed.
+// firebase.js — FINAL CLEAN VERSION (Firebase v8 compat)
+// Replace config only if you need to change project.
 
 var firebaseConfig = {
   apiKey: "AIzaSyALsjcNqBMZwOF3Lfhm1uU_n9A57Bb9gzw",
@@ -11,20 +11,28 @@ var firebaseConfig = {
   measurementId: "G-8WP1PB41LZ"
 };
 
-// ----------------------------
-// Initialize Firebase
-// ----------------------------
-try {
-  firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
+(function () {
+  // Ensure Firebase SDK scripts loaded BEFORE this file.
+  if (!window.firebase) {
+    console.error("❌ Firebase SDK not loaded. Add SDK scripts before firebase.js (see docs).");
+    return;
+  }
 
-  // Export global references
-  window.auth = firebase.auth();
-  window.db = firebase.firestore();
-  window.storage = firebase.storage();
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    } else {
+      firebase.app();
+    }
 
-  console.log("🔥 Firebase initialized successfully");
+    // Expose v8-style globals used by other scripts
+    window.firebaseApp = firebase.app();
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
+    window.storage = firebase.storage();
 
-} catch (err) {
-  console.error("❌ Firebase initialization failed:", err);
-}
+    console.log("✅ Firebase initialized (compat).");
+  } catch (e) {
+    console.error("❌ Firebase initialization error:", e);
+  }
+})();
