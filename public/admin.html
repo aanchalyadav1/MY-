@@ -1,60 +1,86 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin — Aanchal</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* admin-specific */
+    .admin-wrap{max-width:980px;margin:28px auto;padding:18px;z-index:5;position:relative}
+    .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .admin-panel{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04)}
+    .list-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-top:8px}
+    .preview-img{height:56px;width:88px;object-fit:cover;border-radius:6px}
+    .file-input{display:flex;gap:8px;align-items:center}
+  </style>
 </head>
 <body>
   <canvas id="starsCanvas" class="stars-canvas"></canvas>
+  <nav class="top-right-menu">
+    <a href="index.html" class="trm-item">Home</a>
+    <a href="certificates.html" class="trm-item">Certificates</a>
+    <a href="internships.html" class="trm-item">Internships</a>
+    <a href="projects.html" class="trm-item">Projects</a>
+    <button id="signOutBtn" class="trm-item btn-ghost">Sign out</button>
+  </nav>
 
-  <div class="card container" style="max-width:980px;margin:22px auto;position:relative;z-index:3">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="color:var(--neon1);margin:0">Admin Dashboard</h2>
-      <div><button id="signOut" class="btn-ghost">Sign out</button></div>
+  <main class="admin-wrap">
+    <h2>Admin Dashboard</h2>
+    <p style="color:var(--muted)">Manage Certificates, Internships & Projects</p>
+
+    <div class="admin-grid">
+      <!-- Certificates panel -->
+      <div class="admin-panel">
+        <h4>Certificates</h4>
+        <div id="certList"></div>
+
+        <hr style="margin:10px 0"/>
+
+        <input id="certTitle" placeholder="Title" />
+        <input id="certIssuer" placeholder="Issuer" />
+        <div class="file-input" style="margin-top:8px">
+          <input id="certImage" type="file" accept="image/*"/>
+          <div id="certPreview" style="width:88px;height:56px;border-radius:6px;background:rgba(255,255,255,0.02);display:grid;place-items:center;color:var(--muted)">Preview</div>
+        </div>
+        <input id="certLink" placeholder="Certificate URL (optional)" style="margin-top:8px"/>
+        <button id="addCert" class="btn" style="margin-top:10px">Add Certificate</button>
+      </div>
+
+      <!-- Internships & Projects panel -->
+      <div>
+        <div class="admin-panel" style="margin-bottom:14px">
+          <h4>Internships</h4>
+          <div id="internList"></div>
+          <hr style="margin:10px 0"/>
+          <input id="internCompany" placeholder="Company" />
+          <input id="internRole" placeholder="Role" />
+          <input id="internDuration" placeholder="Duration" />
+          <button id="addIntern" class="btn" style="margin-top:10px">Add Internship</button>
+        </div>
+
+        <div class="admin-panel">
+          <h4>Projects</h4>
+          <div id="projectList"></div>
+          <hr style="margin:10px 0"/>
+          <input id="projName" placeholder="Name" />
+          <input id="projDesc" placeholder="Description" />
+          <input id="projUrl" placeholder="Project URL (optional)" />
+          <div class="file-input" style="margin-top:8px">
+            <input id="projImage" type="file" accept="image/*"/>
+            <div id="projPreview" style="width:88px;height:56px;border-radius:6px;background:rgba(255,255,255,0.02);display:grid;place-items:center;color:var(--muted)">Preview</div>
+          </div>
+          <button id="addProj" class="btn" style="margin-top:10px">Add Project</button>
+        </div>
+      </div>
     </div>
 
-    <section>
-      <h3 style="color:var(--muted)">Certificates</h3>
-      <div id="certList"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="certTitle" placeholder="Title">
-        <input id="certIssuer" placeholder="Issuer">
-        <input id="certFile" type="file" accept="image/*,application/pdf">
-        <button id="addCert" class="btn">Add</button>
-      </div>
-    </section>
+  </main>
 
-    <hr/>
-
-    <section>
-      <h3 style="color:var(--muted)">Internships</h3>
-      <div id="internList"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="internCompany" placeholder="Company">
-        <input id="internRole" placeholder="Role">
-        <input id="internDuration" placeholder="Duration">
-        <button id="addIntern" class="btn">Add</button>
-      </div>
-    </section>
-
-    <hr/>
-
-    <section>
-      <h3 style="color:var(--muted)">Projects</h3>
-      <div id="projectList"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="projName" placeholder="Name">
-        <input id="projDesc" placeholder="Desc">
-        <input id="projUrl" placeholder="URL">
-        <input id="projFile" type="file" accept="image/*,video/*">
-        <button id="addProj" class="btn">Add</button>
-      </div>
-    </section>
-  </div>
+  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
   <script src="../scripts/firebase.js" defer></script>
-  <script src="../scripts/admin.js" defer></script>
+  <script src="admin.js" defer></script>
 </body>
 </html>
