@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Upload — Admin helper</title><link rel="stylesheet" href="style.css"><script src="firebase.js" defer></script></head>
+<body>
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
+  <main style="min-height:80vh;display:grid;place-items:center">
+    <div class="card" style="width:420px;padding:20px">
+      <h4>Upload Helper</h4>
+      <input id="fileInput" type="file" accept="image/*"><div id="filePreview" style="margin-top:8px">Preview</div>
+      <button id="uploadBtn" class="btn" style="margin-top:10px">Upload</button>
+      <p style="opacity:.7;margin-top:12px">Uploads to Firebase Storage under /uploads/</p>
+    </div>
+  </main>
+
+  <script src="stars.js" defer></script>
+  <script>
+    document.getElementById('fileInput').addEventListener('change', e=>{
+      const f = e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(ev)=> document.getElementById('filePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;border-radius:8px">`; r.readAsDataURL(f);
+    });
+    document.getElementById('uploadBtn').addEventListener('click', async ()=>{
+      const f = document.getElementById('fileInput').files[0]; if(!f) return alert('Choose file');
+      const name = Date.now() + '_' + f.name.replace(/\s+/g,'_'), ref = window.storage.ref().child('uploads/'+name); await ref.put(f); const url = await ref.getDownloadURL(); alert('Uploaded: '+url);
+    });
+  </script>
+</body>
+</html>
