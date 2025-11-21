@@ -1,61 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Internships — Aanchal Yadav</title>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Internships — Aanchal</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <link rel="stylesheet" href="style.css">
-  <script src="firebase.js" defer></script>
 </head>
 <body>
-  <canvas id="starsCanvas" class="stars-canvas"></canvas>
-  <nav class="top-right-menu">
-    <a href="index.html" class="trm-item">Home</a>
-    <a href="certificates.html" class="trm-item">Certificates</a>
-    <a href="internships.html" class="trm-item">Internships</a>
-    <a href="projects.html" class="trm-item">Projects</a>
-    <a href="login.html" class="trm-item">Admin</a>
-  </nav>
-
-  <div class="float-nav">
-    <button class="float-btn" data-href="index.html">🏠</button>
-    <button class="float-btn" data-href="certificates.html">📜</button>
-    <button class="float-btn" data-href="internships.html">💼</button>
-    <button class="float-btn" data-href="projects.html">🧩</button>
-  </div>
-
-  <main class="container" style="padding-top:80px">
-    <header style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <div class="ay-avatar avatar">AY</div>
-      <div>
-        <h2 style="margin:0">Internships</h2>
-        <div style="color:var(--muted)">Practical experience & roles</div>
-      </div>
-    </header>
-
-    <section id="internList" style="display:flex;flex-direction:column;gap:12px"></section>
+  <nav class="top-right-menu"><a href="index.html" class="trm-item">Home</a><a href="admin.html" class="trm-item">Admin</a></nav>
+  <main class="container">
+    <h1>Internships</h1>
+    <div id="interns" class="list"></div>
   </main>
+  <div id="toasts" class="toasts"></div>
 
-  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
-
-  <script src="stars.js" defer></script>
-  <script src="avatar.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="firebase.js" defer></script>
+  <script src="global.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      if(!window.db) return;
-      const box = document.getElementById('internList'); box.innerHTML = '<p style="opacity:.6">Loading…</p>';
-      try{
-        const doc = await db.collection('internships').doc('list').get();
-        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items.slice().reverse() : [];
-        if(!items.length){ box.innerHTML='<p style="opacity:.7">No internships yet.</p>'; return; }
-        box.innerHTML = '';
+    (function(){
+      const db = window.db;
+      const wrap = document.getElementById('interns');
+      if(!db){ wrap.innerHTML = '<p style="opacity:.8">Firebase not loaded</p>'; return; }
+      showSkeleton && showSkeleton('#interns', 3);
+      db.collection('internships').doc('list').get().then(doc=>{
+        const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+        wrap.innerHTML = items.length ? '' : '<p style="opacity:.8">No internships</p>';
         items.forEach(it=>{
-          const el = document.createElement('div'); el.className='cardItem card';
-          el.innerHTML = `<strong>${(it.company||'')}</strong><div style="color:var(--muted);font-size:13px;margin-top:6px">${(it.role||'')} • ${(it.duration||'')}</div>`;
-          box.appendChild(el);
+          const row=document.createElement('div'); row.className='list-row';
+          row.innerHTML = `<div><strong>${it.company}</strong><div style="color:var(--muted)">${it.role||''} • ${it.duration||''}</div></div>`;
+          wrap.appendChild(row);
         });
-      }catch(e){ console.error(e); box.innerHTML='<p style="opacity:.7">Error</p>'; }
-    });
+      }).catch(e=>{ console.error(e); wrap.innerHTML='<p style="opacity:.8">Error</p>'; });
+    })();
   </script>
 </body>
 </html>
