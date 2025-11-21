@@ -1,60 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Projects — Aanchal</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Projects — Aanchal Yadav</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js" defer></script>
+  <style>
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    @media (max-width:880px){ .cards{grid-template-columns:1fr} }
+    .proj-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
+    .proj-link{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);color:var(--muted);text-decoration:none}
+  </style>
 </head>
 <body>
-  <canvas id="starsCanvas"></canvas>
-
-  <nav class="top-right-menu" aria-label="Primary">
+  <canvas id="starsCanvas" class="stars-canvas"></canvas>
+  <nav class="top-right-menu">
     <a href="index.html" class="trm-item">Home</a>
     <a href="certificates.html" class="trm-item">Certificates</a>
     <a href="internships.html" class="trm-item">Internships</a>
-    <a href="projects.html" class="trm-item active">Projects</a>
-    <a href="login.html" class="trm-item admin-link">Admin</a>
+    <a href="projects.html" class="trm-item">Projects</a>
+    <a href="login.html" class="trm-item">Admin</a>
   </nav>
 
-  <div class="float-nav">
-    <button class="float-btn" data-href="index.html" title="Home">🏠</button>
-  </div>
+  <main class="container" style="padding-top:80px;">
+    <header style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <div class="avatar-initials">AY</div>
+      <div>
+        <h2 style="margin:0">Projects</h2>
+        <div style="color:var(--muted);margin-top:4px">Selected projects & demos</div>
+      </div>
+    </header>
 
-  <main class="page fade-in">
-    <section class="section container">
-      <h2 class="section-title">Projects</h2>
-      <div id="projectsCards" class="cards"><div class="card">Loading…</div></div>
-    </section>
+    <section id="projGrid" class="cards"></section>
   </main>
 
-  <nav class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="certificates.html">Certificates</a>
-    <a href="internships.html">Internships</a>
-    <a href="projects.html" class="active">Projects</a>
-  </nav>
-
-  <footer class="site-foot">© 2025 Aanchal</footer>
+  <footer class="site-foot">© 2025 Aanchal Yadav</footer>
 
   <script src="stars.js" defer></script>
-  <script src="firebase.js" defer></script>
-  <script src="auth.js" defer></script>
+  <script src="../scripts/firebase.js" defer></script>
   <script>
-    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c])); }
-    async function loadProjects(){
-      const el = document.getElementById('projectsCards');
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      const box = document.getElementById('projGrid');
+      box.innerHTML = '<p style="opacity:.6">Loading…</p>';
       try{
-        const doc = await firebase.firestore().collection('projects').doc('list').get();
+        const doc = await db.collection('projects').doc('list').get();
         const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
-        if(items.length===0){ el.innerHTML='<div class=\"card\">No projects yet.</div>'; return; }
-        el.innerHTML = items.map(p=>`<div class=\"card\"><h4>${escapeHtml(p.name)}</h4><p>${escapeHtml(p.desc||'')}</p><p style=\"margin-top:8px\"><a href=\"${encodeURI(p.url||'#')}\" target=\"_blank\">View</a></p></div>`).join('');
-      }catch(e){ console.error(e); el.innerHTML = '<div class=\"card\">Error loading</div>'; }
-    }
-    window.addEventListener('load', loadProjects);
-    document.querySelectorAll('.float-btn').forEach(b=>b.addEventListener('click',()=>location.href=b.getAttribute('data-href')));
+        if(!items.length){ box.innerHTML = '<p style="opacity:.7">No projects yet.</p>'; return; }
+        box.innerHTML = '';
+        items.forEach(p=>{
+          const el = document.createElement('div'); el.className='proj-card cardItem';
+          el.innerHTML = `
+            <strong>${escapeHtml(p.name)}</strong>
+            <div style="color:var(--muted);margin-top:6px">${escapeHtml(p.desc||'')}</div>
+            ${p.url ? `<a class="proj-link" href="${p.url}" target="_blank">Open project</a>` : ''}
+          `;
+          box.appendChild(el);
+        });
+      }catch(e){ console.error(e); box.innerHTML = '<p style="opacity:.7">Error loading projects</p>'; }
+    });
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
   </script>
 </body>
 </html>
